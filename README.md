@@ -1,4 +1,4 @@
-# Pwidget for Testing
+# Pwidget for Software Testing
 
 > This repo is for the final assignment in Software Testing. I hope it will be useful in my future Software Development
 
@@ -23,7 +23,7 @@
 
 > 子页面：主页、生成测试用例界面、正交表查询界面、显示历史记录
 
-- [ ] PyQT GUI设计
+- [x] PyQT GUI设计
 - [ ] 输入水平数和因素数框
 - [ ] 输入测试用例需要的类别框
 - [ ] 生成出来的测试用例框
