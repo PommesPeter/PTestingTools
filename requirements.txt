@@ -1,0 +1,4 @@
+pyqt5
+requests
+numpy
+pandas

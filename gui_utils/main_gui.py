@@ -91,7 +91,7 @@ class MainUI(QtWidgets.QMainWindow):
             '''
             QPushButton{ 
             background:#F76677;
-            border-radius:5px;
+            border-radius:10px;
             }
             QPushButton:hover{
             background:red;
@@ -101,17 +101,18 @@ class MainUI(QtWidgets.QMainWindow):
             '''
             QPushButton{
             background:#F7D674;
-            border-radius:5px;
+            border-radius:10px;
+            
             }
             QPushButton:hover{
             background:yellow;
             }
-            ''')
+        ''')
         self.left_mini.setStyleSheet(
             '''
             QPushButton{
                 background:#6DDF6D;
-                border-radius:5px;
+                border-radius:10px;
             }
             QPushButton:hover{
                 background:green;
@@ -161,6 +162,7 @@ class MainUI(QtWidgets.QMainWindow):
                     padding:2px 4px;
             }
             ''')
+        self.right_search_widget_input.returnPressed.connect(self.on_lineEdit_enter)
 
         self.right_bar_layout.addWidget(self.search_icon, 0, 0, 1, 1)
         self.right_bar_layout.addWidget(self.right_search_widget_input, 0, 1, 1, 8)
@@ -197,7 +199,6 @@ class MainUI(QtWidgets.QMainWindow):
         self.search_icon = QtWidgets.QLabel(chr(0xf002) + ' ' + '水平数^因素数  ')
         self.search_icon.setFont(qtawesome.font('fa', 16))
         self.right_search_widget_input = QtWidgets.QLineEdit()
-        self.right_search_widget_input
         self.right_search_widget_input.setPlaceholderText("请输入水平数^因素数")
         self.right_search_widget_input.setStyleSheet(
             '''
@@ -222,3 +223,7 @@ class MainUI(QtWidgets.QMainWindow):
     def on_button_generating_table_page_switch(self):
         self.right_bar_widget.setVisible(True)
         self.right_software_title.setVisible(False)
+
+    def on_lineEdit_enter(self):
+        print(1)
+        pass
