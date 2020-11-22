@@ -5,7 +5,6 @@ import sys
 import qtawesome
 
 
-
 class MainUI(QtWidgets.QMainWindow):
     def __init__(self):
         super(MainUI, self).__init__()

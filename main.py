@@ -1,12 +1,12 @@
 
-from gui_utils.main_gui import MainUI
-from PyQt5 import QtWidgets, QtCore
+from Pwidgets.gui_utils.main_gui import MainUI
+from Pwidgets.gui_utils.show_result import *
 import sys
 
+load_table()
 
 if __name__ == '__main__':
 
-    widget = QtWidgets.QApplication(sys.argv)
     Gui = MainUI()
     Gui.show()
-    sys.exit(widget.exec_())
+    sys.exit(Gui.exec_())
