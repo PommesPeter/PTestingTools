@@ -2,3 +2,6 @@ pyqt5
 requests
 numpy
 pandas
+six
+pygame
+

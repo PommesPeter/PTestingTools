@@ -5,7 +5,6 @@ from PyQt5 import QtCore, QtWidgets
 
 from gui_utils.custom_widgets import myQLineEdit
 
-
 class MainUI(QtWidgets.QMainWindow):
     def __init__(self):
         super(MainUI, self).__init__()
