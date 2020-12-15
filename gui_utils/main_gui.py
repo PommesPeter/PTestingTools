@@ -1,9 +1,9 @@
 # coding: utf-8
 
-from PyQt5 import QtCore, QtGui, QtWidgets
-import sys
 import qtawesome
+from PyQt5 import QtCore, QtWidgets
 
+from gui_utils.custom_widgets import myQLineEdit
 
 
 class MainUI(QtWidgets.QMainWindow):
@@ -151,7 +151,8 @@ class MainUI(QtWidgets.QMainWindow):
         self.right_bar_widget.setLayout(self.right_bar_layout)
         self.search_icon = QtWidgets.QLabel(chr(0xf002) + ' ' + '水平数^因素数  ')
         self.search_icon.setFont(qtawesome.font('fa', 16))
-        self.right_search_widget_input = QtWidgets.QLineEdit()
+        # self.right_search_widget_input = QtWidgets.QLineEdit()
+        self.right_search_widget_input = myQLineEdit(self.right_bar_layout)
         self.right_search_widget_input.setPlaceholderText("请输入水平数^因素数")
         self.right_search_widget_input.setStyleSheet(
             '''
@@ -162,7 +163,7 @@ class MainUI(QtWidgets.QMainWindow):
                     padding:2px 4px;
             }
             ''')
-        self.right_search_widget_input.returnPressed.connect(self.on_lineEdit_enter)
+        # self.right_search_widget_input.returnPressed.connect(self.on_lineEdit_enter)
 
         self.right_bar_layout.addWidget(self.search_icon, 0, 0, 1, 1)
         self.right_bar_layout.addWidget(self.right_search_widget_input, 0, 1, 1, 8)
@@ -170,28 +171,51 @@ class MainUI(QtWidgets.QMainWindow):
         self.right_layout.addWidget(self.right_bar_widget, 0, 0, 1, 9)
 
     def init_main_page(self):
-
         # self.main_page_frame = QtWidgets.QFrame()
-        self.right_software_title = QtWidgets.QFrame()
+        self.right_subwidgets = QtWidgets.QFrame()
         # self.software_title = QtWidgets.QWidget()
-        self.software_title_layout = QtWidgets.QGridLayout()
-        self.right_software_title.setLayout(self.software_title_layout)
-        self.title_widget = QtWidgets.QLabel()
-        self.title_widget.setText("正交表查询工具")
-        self.title_widget.setFont(qtawesome.font('fa', 16))
-        self.title_widget.resize(200, 200)
-        self.title_widget.setStyleSheet('''
-        QLabel {
-            font: bold;
-            font-size: 20px;
-            color: red;
-        ''')
-        self.software_title_layout.addWidget(self.title_widget, 0, 1, 1, 8)
-        self.right_layout.addWidget(self.right_software_title, 0, 0, 1, 9)
+        self.right_subwidgets_layout = QtWidgets.QGridLayout()
+        # 添加组件，往right_software_title
+        self.right_subwidgets.setLayout(self.right_subwidgets_layout)
 
+        self.title_widget = QtWidgets.QLabel()
+        self.title_widget.setObjectName("title_label")
+        self.title_widget.setText("正交表查询工具")
+        self.title_widget.setAlignment(QtCore.Qt.AlignHCenter)
+        self.title_widget.setStyleSheet(
+            '''
+            QLabel#title_label {
+                border:none;
+                color: red;
+                font-size:30px;
+                font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            }
+        '''
+        )
+
+        self.introduction_background = QtWidgets.QLabel()
+        self.introduction_background.setObjectName("introduction_background")
+
+        self.introduction_label_widget = QtWidgets.QLabel()
+        self.introduction_label_widget.setObjectName("introduction_label")
+        self.introduction_label_widget.setText(
+            "本工具由1900301236谢浚霖开发，可以实现根据正交表以及输入的水平数和因素数自动生成测试用例\n\nPommesPeter\t\nEmail:me@pommespeter.com\t\nGithub ID: PommesPeter\t\nTencentQQ: 434596665")
+        self.introduction_label_widget.setStyleSheet('''
+            QLabel#introduction_label {
+                border-radius:5px;
+                font-size: 40px;
+                font-family: " times new romance"
+                background-color: gray;
+            }
+        ''')
+        self.introduction_label_widget.wordWrap()
+        self.introduction_label_widget.resize(50, 50)
+        self.right_subwidgets_layout.addWidget(self.title_widget, 0, 1, 1, 8)
+        self.right_subwidgets_layout.addWidget(self.introduction_label_widget, 0, 1, 1, 8)
+        self.right_layout.addWidget(self.right_subwidgets, 0, 0, 1, 9)
+        self.right_layout.addWidget(self.title_widget, 0, 0, 1, 10)
 
     def init_generating_table_page(self):
-
         self.right_bar_widget = QtWidgets.QFrame()
         # self.right_bar_widget = QtWidgets.QWidget()
         self.right_bar_layout = QtWidgets.QGridLayout()
@@ -218,11 +242,11 @@ class MainUI(QtWidgets.QMainWindow):
 
     def on_button_main_page_switch(self):
         self.right_bar_widget.setVisible(False)
-        self.right_software_title.setVisible(True)
+        self.right_subwidgets.setVisible(True)
 
     def on_button_generating_table_page_switch(self):
         self.right_bar_widget.setVisible(True)
-        self.right_software_title.setVisible(False)
+        self.right_subwidgets.setVisible(False)
 
     def on_lineEdit_enter(self):
         print(1)
