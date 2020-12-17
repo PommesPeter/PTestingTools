@@ -1,17 +1,16 @@
 # coding: utf-8
 
 import re
-
+import os
 import qtawesome
 from PyQt5 import QtCore, QtWidgets, QtGui
-
-from gui_utils.custom_widgets import myQLineEdit
-from gui_utils.thread_ui import UI_Thread
 
 
 class MainUI(QtWidgets.QMainWindow):
     def __init__(self):
         super(MainUI, self).__init__()
+        self.factor_level = ""
+        self.final_result = ""
         self.setFixedSize(1270, 800)
         self.main_widget = QtWidgets.QWidget()
         self.main_layout = QtWidgets.QGridLayout()
@@ -28,9 +27,9 @@ class MainUI(QtWidgets.QMainWindow):
             QPushButton#left_label{
                 border:none;
                 border-bottom:1px solid white;
-                font-size:18px;
+                font-size:20px;
                 font-weight:700;
-                font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+                font-family: Microsoft YaHei UI;
             }
             QPushButton#left_button:hover{
             border-left:4px solid red;
@@ -64,7 +63,7 @@ class MainUI(QtWidgets.QMainWindow):
                 border:none;
                 font-size:16px;
                 font-weight:700;
-                font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+                font-family: Microsoft YaHei UI;
             }
         ''')
         self.right_widget.setLayout(self.right_layout)
@@ -81,10 +80,10 @@ class MainUI(QtWidgets.QMainWindow):
         self.init_button()
         self.init_main_page()
         self.init_generating_table_page()
-        self.thread_ui = UI_Thread()
 
     def init_button(self):
         self.left_close = QtWidgets.QPushButton("")
+        self.left_close.clicked.connect(self.on_close_program)
         self.left_visit = QtWidgets.QPushButton("")
         self.left_mini = QtWidgets.QPushButton("")
         self.left_close.setFixedSize(20, 20)  # 设置关闭按钮的大小
@@ -125,7 +124,7 @@ class MainUI(QtWidgets.QMainWindow):
             QPushButton:pressed{
                 background:rgb(0,255,0);
             }
-            ''')
+        ''')
 
         self.left_label_main_page_label = QtWidgets.QPushButton("首页")
         self.left_label_main_page_label.setObjectName("left_label")
@@ -143,9 +142,9 @@ class MainUI(QtWidgets.QMainWindow):
         self.left_button_history_table = QtWidgets.QPushButton(qtawesome.icon('fa.history', color='white'), "历史记录")
         self.left_button_history_table.setObjectName('left_button')
 
-        self.left_layout.addWidget(self.left_mini, 0, 0, 1, 1)
+        self.left_layout.addWidget(self.left_mini, 0, 2, 1, 1)
         self.left_layout.addWidget(self.left_visit, 0, 1, 1, 1)
-        self.left_layout.addWidget(self.left_close, 0, 2, 1, 1)
+        self.left_layout.addWidget(self.left_close, 0, 0, 1, 1)
         self.left_layout.addWidget(self.left_label_main_page_label, 1, 0, 1, 3)
         self.left_layout.addWidget(self.left_button_main_page, 2, 0, 1, 3)
         self.left_layout.addWidget(self.left_label_function_page, 3, 0, 1, 3)
@@ -157,22 +156,6 @@ class MainUI(QtWidgets.QMainWindow):
         self.right_bar_widget = QtWidgets.QWidget()
         self.right_bar_layout = QtWidgets.QGridLayout()
         self.right_bar_widget.setLayout(self.right_bar_layout)
-        self.search_icon = QtWidgets.QLabel(chr(0xf002) + ' ' + '水平数^因素数  ')
-        self.search_icon.setFont(qtawesome.font('fa', 16))
-        # self.right_search_widget_input = QtWidgets.QLineEdit()
-        self.right_search_widget_input = myQLineEdit(self.right_bar_layout)
-        self.right_search_widget_input.setPlaceholderText("请输入水平数^因素数")
-        self.right_search_widget_input.setStyleSheet('''
-            QLineEdit{
-                    border:1px solid gray;
-                    width:300px;
-                    border-radius:10px;
-                    padding:2px 4px;
-            }
-            ''')
-        # self.right_search_widget_input.returnPressed.connect(self.on_lineEdit_enter)
-        # self.right_bar_layout.addWidget(self.search_icon, 0, 0, 1, 1)
-        # self.right_bar_layout.addWidget(self.right_search_widget_input, 0, 1, 1, 8)
 
         self.right_layout.addWidget(self.right_bar_widget, 0, 0, 1, 9)
 
@@ -184,70 +167,69 @@ class MainUI(QtWidgets.QMainWindow):
         # 添加组件，往right_software_title
         self.right_subwidgets.setLayout(self.right_subwidgets_layout)
 
-        # self.title_widget = QtWidgets.QLabel()
-        # self.title_widget.setObjectName("title_label")
-        # self.title_widget.setText("正交表查询工具")
-        # self.title_widget.setAlignment(QtCore.Qt.AlignHCenter)
-        # self.title_widget.setStyleSheet('''
-        #     QLabel#title_label {
-        #         border:none;
-        #         color: red;
-        #         font-size:30px;
-        #         font-family: SimSun;
-        #     }
-        # ''')
-
         self.img = QtGui.QPixmap('E:/Workspace/Python/Pwidgets/gui_utils/pic/1.png')
         self.img_label = QtWidgets.QLabel()
         self.img_label.setObjectName("img_label")
         self.img_label.setPixmap(self.img)
+        self.img_label.setStyleSheet('''
+            QLabel{
+                margin-bottom: 225px;
+            }
+        ''')
+
+        self.about_button = QtWidgets.QPushButton("关于我")
+        self.about_button.setObjectName("about_button")
+        self.about_button.setStyleSheet('''
+            QPushButton#about_button {
+                width: 20px;
+                height: 40px;
+                background-color: gray;
+                border: 3px solid gray;
+                border-radius: 5px;
+                color: white;
+                font-family: Microsoft YaHei UI;
+                font-size: 25px;
+            }
+            QPushButton#about_button:hover{
+                width: 20px;
+                height: 40px;
+                background-color: rgb(65,65,65);
+                border: 3px solid gray;
+                border-radius: 5px;
+                border-color: rgb(65,65,65);
+                color: white;
+                font-family: Microsoft YaHei UI;
+            }
+            QPushButton#about_button:pressed{
+                width: 20px;
+                height: 40px;
+                background-color: rgb(1,1,1);
+                border: 3px solid gray;
+                border-radius: 5px;
+                border-color: rgb(1,1,1);
+                color: white;
+                font-family: Microsoft YaHei UI;
+            }
+        ''')
+        self.about_button.clicked.connect(self.on_about_msg_box)
 
         self.introduction_background = QtWidgets.QLabel()
         self.introduction_background.setObjectName("introduction_background")
 
-        self.introduction_label_widget = QtWidgets.QLabel()
-        self.introduction_label_widget.setWordWrap(True)
-        self.introduction_label_widget.setObjectName("introduction_label")
-        self.introduction_label_widget.setText(
-            "本工具由1900301236谢浚霖开发，可以实现根据正交表以及输入的水平数和因素数自动生成测试用例\n")
-        self.introduction_label_widget.setStyleSheet('''
-            QLabel#introduction_label {
-                border-radius:45px;
-                font-size: 25px;
-                font-family: SimSun;
-            }
-        ''')
-
-        self.introdcution_label_widget_2 = QtWidgets.QLabel()
-        self.introdcution_label_widget_2.setWordWrap(True)
-        self.introdcution_label_widget_2.setObjectName("troduction_label_2")
-        self.introdcution_label_widget_2.setText(
-            "PommesPeter\t\nEmail:me@pommespeter.com\t\nGithub ID: PommesPeter\t\nTencentQQ: 434596665")
-        self.introdcution_label_widget_2.setStyleSheet('''
-            QLabel{
-                font-family: SimSun;
-                font-size: 25px;
-            }
-        ''')
-        self.introduction_label_widget.resize(50, 50)
-        # self.introduction_label_widget_2.resize(50, 50)
         self.right_subwidgets_layout.addWidget(self.img_label, 1, 0, 1, 5)
-        # self.right_subwidgets_layout.addWidget(self.title_widget, 2, 1, 2, 5)
-        self.right_subwidgets_layout.addWidget(self.introduction_label_widget, 3, 1, 1, 3)
-        self.right_subwidgets_layout.addWidget(self.introdcution_label_widget_2, 4, 0, 1, 5)
+        self.right_subwidgets_layout.addWidget(self.about_button, 4, 4, 1, 1)
         self.right_layout.addWidget(self.right_subwidgets, 0, 0, 1, 9)
-        # self.right_layout.addWidget(self.title_widget, 0, 0, 1, 10)
 
     def init_generating_table_page(self):
         self.right_bar_widget = QtWidgets.QFrame()
-        # self.right_bar_widget = QtWidgets.QWidget()
         self.right_bar_layout = QtWidgets.QGridLayout()
         self.right_bar_widget.setLayout(self.right_bar_layout)
         self.search_icon = QtWidgets.QLabel(chr(0xf002) + ' ' + '水平数^因素数  ')
-        self.search_icon.setFont(qtawesome.font('fa', 20))
+        self.search_icon.setFont(qtawesome.font('fa', 25))
         self.search_icon.setStyleSheet('''
             QLabel{
-                margin-top: 40px;
+                margin-top:30px;
+                font-size: 25px;
             }
         ''')
         self.right_search_widget_input = QtWidgets.QLineEdit()
@@ -259,7 +241,7 @@ class MainUI(QtWidgets.QMainWindow):
                     border-radius:10px;
                     margin-top: 30px;
                     font-size: 25px;
-                    font-family: SimHei;
+                    font-family: Microsoft YaHei UI;
             }
             ''')
         self.factor_box = QtWidgets.QPlainTextEdit(self)
@@ -277,7 +259,7 @@ class MainUI(QtWidgets.QMainWindow):
                 border-radius:5px;
                 padding: 5px;
                 font-size: 25px;
-                font-family: SimHei;
+                font-family: Microsoft YaHei UI;
             }
         ''')
         self.output_box.setStyleSheet('''
@@ -287,21 +269,21 @@ class MainUI(QtWidgets.QMainWindow):
                border-radius:5px;
                padding 5px;
                font-size: 25px;
-               font-family: SimHei;
+               font-family: Microsoft YaHei UI;
            }
         ''')
 
         self.factor_box_label = QtWidgets.QLabel("水平因素框")
         self.factor_box_label.setStyleSheet('''
             QLabel {
-                font-family: SimHei;
+                font-family: Microsoft YaHei UI;
                 font-size: 30px;
             }
         ''')
         self.output_box_label = QtWidgets.QLabel("样例生成框")
         self.output_box_label.setStyleSheet('''
             QLabel {
-                font-family: SimHei;
+                font-family: Microsoft YaHei UI;
                 font-size: 30px;
             }
         ''')
@@ -309,14 +291,14 @@ class MainUI(QtWidgets.QMainWindow):
         self.commit_button.setObjectName("generate_button")
         self.commit_button.setStyleSheet('''
             QPushButton#generate_button{
-                width: 30px;
+                width: 20px;
                 height: 40px;
                 background-color: gray;
                 border: 3px solid gray;
                 border-radius: 5px;
                 color: white;
-                font-family: SimSun;
-                font-size: 30px;
+                font-family: Microsoft YaHei UI;
+                font-size: 25px;
             }
             QPushButton#generate_button:hover{
                 width: 30px;
@@ -325,8 +307,7 @@ class MainUI(QtWidgets.QMainWindow):
                 border-radius: 5px;
                 border-color: rgb(65,65,65);
                 color: white;
-                font-family: Arial;
-                font-family: SimSun;
+                font-family: Microsoft YaHei UI;
             }
             QPushButton#generate_button:pressed{
                 width: 30px;
@@ -335,54 +316,123 @@ class MainUI(QtWidgets.QMainWindow):
                 border-radius: 5px;
                 border-color: rgb(1,1,1);
                 color: white;
-                font-family: Arial;
-                font-family: SimSun;
+                font-family: Microsoft YaHei UI;
             }
         ''')
-
         self.reset_button = QtWidgets.QPushButton("重置")
         self.reset_button.setObjectName("reset_button")
         self.reset_button.setStyleSheet('''
-                    QPushButton#reset_button{
-                        width: 30px;
-                        height: 40px;
-                        background-color: gray;
-                        border: 3px solid gray;
-                        border-radius: 5px;
-                        color: white;
-                        font-family: SimSun;
-                        font-size: 30px;
-                    }
-                    QPushButton#reset_button:hover{
-                        width: 30px;
-                        background-color: rgb(65,65,65);
-                        border: 3px solid gray;
-                        border-radius: 5px;
-                        border-color: rgb(65,65,65);
-                        color: white;
-                        font-family: Arial;
-                        font-family: SimSun;
-                    }
-                    QPushButton#reset_button:pressed{
-                        width: 30px;
-                        background-color: rgb(1,1,1);
-                        border: 3px solid gray;
-                        border-radius: 5px;
-                        border-color: rgb(1,1,1);
-                        color: white;
-                        font-family: Arial;
-                        font-family: SimSun;
-                    }
-                ''')
+            QPushButton#reset_button{
+                width: 20px;
+                height: 40px;
+                background-color: gray;
+                border: 3px solid gray;
+                border-radius: 5px;
+                color: white;
+                font-family: Microsoft YaHei UI;
+                font-size: 25px;
+            }
+            QPushButton#reset_button:hover{
+                width: 30px;
+                background-color: rgb(65,65,65);
+                border: 3px solid gray;
+                border-radius: 5px;
+                border-color: rgb(65,65,65);
+                color: white;
+                font-family: Microsoft YaHei UI;
+            }
+            QPushButton#reset_button:pressed{
+                width: 30px;
+                background-color: rgb(1,1,1);
+                border: 3px solid gray;
+                border-radius: 5px;
+                border-color: rgb(1,1,1);
+                color: white;
+                font-family: Microsoft YaHei UI;
+            }
+        ''')
 
+        self.import_factor_button = QtWidgets.QPushButton("导入")
+        self.import_factor_button.setObjectName("import_button")
+        self.import_factor_button.clicked.connect(self.on_import_factor_button)
+        self.export_sample_button = QtWidgets.QPushButton("导出")
+        self.export_sample_button.setObjectName("export_button")
+        self.export_sample_button.clicked.connect(self.on_export_sample_button)
+
+        self.import_factor_button.setStyleSheet('''
+            QPushButton#import_button{
+                width: 20px;
+                height: 40px;
+                background-color: gray;
+                border: 3px solid gray;
+                border-radius: 5px;
+                color: white;
+                font-family: Microsoft YaHei UI;
+                font-size: 25px;
+            }
+            QPushButton#import_button:hover{
+                width: 20px;
+                height: 40px;
+                background-color: rgb(65,65,65);
+                border: 3px solid gray;
+                border-radius: 5px;
+                border-color: rgb(65,65,65);
+                color: white;
+                font-family: Microsoft YaHei UI;
+            }
+            QPushButton#import_button:pressed{
+                width: 20px;
+                height: 40px;
+                background-color: rgb(1,1,1);
+                border: 3px solid gray;
+                border-radius: 5px;
+                border-color: rgb(1,1,1);
+                color: white;
+                font-family: Microsoft YaHei UI;
+            }
+        ''')
+        self.export_sample_button.setStyleSheet('''
+            QPushButton#export_button{
+                width: 20px;
+                height: 40px;
+                background-color: gray;
+                border: 3px solid gray;
+                border-radius: 5px;
+                color: white;
+                font-family: Microsoft YaHei UI;
+                font-size: 25px;
+            }
+            QPushButton#export_button:hover{
+                width: 20px;
+                height: 40px;
+                background-color: rgb(65,65,65);
+                border: 3px solid gray;
+                border-radius: 5px;
+                border-color: rgb(65,65,65);
+                color: white;
+                font-family: Microsoft YaHei UI;
+            }
+            QPushButton#export_button:pressed{
+                width: 20px;
+                height: 40px;
+                background-color: rgb(1,1,1);
+                border: 3px solid gray;
+                border-radius: 5px;
+                border-color: rgb(1,1,1);
+                color: white;
+                font-family: Microsoft YaHei UI;
+            }
+        ''')
         self.commit_button.clicked.connect(self.on_commit_factor_num)
         self.reset_button.clicked.connect(self.on_button_reset_input_box)
         self.right_bar_layout.addWidget(self.search_icon, 1, 0, 1, 1)
         self.right_bar_layout.addWidget(self.right_search_widget_input, 1, 1, 1, 5)
         self.right_bar_layout.addWidget(self.factor_box_label, 2, 0, 1, 1)
         self.right_bar_layout.addWidget(self.output_box_label, 2, 3, 1, 1)
-        self.right_bar_layout.addWidget(self.factor_box, 3, 0, 3, 3)
-        self.right_bar_layout.addWidget(self.output_box, 3, 3, 3, 4)
+        self.right_bar_layout.addWidget(self.import_factor_button, 3, 2, 1, 1)
+        self.right_bar_layout.addWidget(self.export_sample_button, 3, 6, 1, 1)
+        self.right_bar_layout.addWidget(self.factor_box, 4, 0, 3, 3)
+        self.right_bar_layout.addWidget(self.output_box, 4, 3, 3, 4)
         self.right_layout.addWidget(self.commit_button, 6, 1, 1, 3)
         self.right_layout.addWidget(self.reset_button, 6, 5, 1, 3)
 
@@ -418,12 +468,14 @@ class MainUI(QtWidgets.QMainWindow):
         cancle_button = QtWidgets.QPushButton("取消")
         confirm_button.setStyleSheet('''
             QPushButton{
+                width: 60px;
+                height: 30px;
                 background-color: gray;
                 border: 3px solid gray;
                 border-radius: 5px;
                 color: white;
-                font-family: SimSun;
-                font-size:25px;
+                font-family: Microsoft YaHei UI;
+                font-size:20px;
             }
             QPushButton:hover{
                 background-color: rgb(65,65,65);
@@ -431,8 +483,7 @@ class MainUI(QtWidgets.QMainWindow):
                 border-radius: 5px;
                 border-color: rgb(65,65,65);
                 color: white;
-                font-family: Arial;
-                font-family: SimSun;
+                font-family: Microsoft YaHei UI;
             }
             QPushButton:pressed{
                 background-color: rgb(1,1,1);
@@ -440,18 +491,19 @@ class MainUI(QtWidgets.QMainWindow):
                 border-radius: 5px;
                 border-color: rgb(1,1,1);
                 color: white;
-                font-family: Arial;
-                font-family: SimSun;
+                font-family: Microsoft YaHei UI;
             }
         ''')
         cancle_button.setStyleSheet('''
             QPushButton{
+                width: 60px;
+                height: 30px;
                 background-color: gray;
                 border: 3px solid gray;
                 border-radius: 5px;
                 color: white;
-                font-family: SimSun;
-                font-size:25px;
+                font-family: Microsoft YaHei UI;
+                font-size:20px;
             }
             QPushButton:hover{
                 background-color: rgb(65,65,65);
@@ -459,8 +511,7 @@ class MainUI(QtWidgets.QMainWindow):
                 border-radius: 5px;
                 border-color: rgb(65,65,65);
                 color: white;
-                font-family: Arial;
-                font-family: SimSun;
+                font-family: Microsoft YaHei UI;
             }
             QPushButton:pressed{
                 background-color: rgb(1,1,1);
@@ -468,8 +519,7 @@ class MainUI(QtWidgets.QMainWindow):
                 border-radius: 5px;
                 border-color: rgb(1,1,1);
                 color: white;
-                font-family: Arial;
-                font-family: SimSun;
+                font-family: Microsoft YaHei UI;
             }
         ''')
         self.error_msgbox.addButton(confirm_button, QtWidgets.QMessageBox.YesRole)
@@ -477,7 +527,7 @@ class MainUI(QtWidgets.QMainWindow):
         self.error_msgbox.setWindowFlag(QtCore.Qt.FramelessWindowHint)  # 隐藏边框
         self.error_msgbox.setStyleSheet('''
             QMessageBox{
-                font-family:SimHei;
+                font-family:Microsoft YaHei UI;
                 font-size:25px;
                 background-color:white;
                 border:5px solid gray;
@@ -489,7 +539,8 @@ class MainUI(QtWidgets.QMainWindow):
             self.on_button_reset_input_box()
         elif self.error_msgbox == QtWidgets.QMessageBox.No:
             self.on_button_reset_input_box()
-            return
+        else:
+            self.on_button_reset_input_box()
 
     def empty_msg_box(self):
         self.empty_msgbox = QtWidgets.QMessageBox()
@@ -503,7 +554,7 @@ class MainUI(QtWidgets.QMainWindow):
                 border: 3px solid gray;
                 border-radius: 5px;
                 color: white;
-                font-family: SimSun;
+                font-family: Microsoft YaHei UI;
                 font-size:25px;
             }
             QPushButton:hover{
@@ -512,8 +563,7 @@ class MainUI(QtWidgets.QMainWindow):
                 border-radius: 5px;
                 border-color: rgb(65,65,65);
                 color: white;
-                font-family: Arial;
-                font-family: SimSun;
+                font-family: Microsoft YaHei UI;
             }
             QPushButton:pressed{
                 background-color: rgb(1,1,1);
@@ -521,8 +571,7 @@ class MainUI(QtWidgets.QMainWindow):
                 border-radius: 5px;
                 border-color: rgb(1,1,1);
                 color: white;
-                font-family: Arial;
-                font-family: SimSun;
+                font-family: Microsoft YaHei UI;
             }
         ''')
         cancle_button.setStyleSheet('''
@@ -531,7 +580,7 @@ class MainUI(QtWidgets.QMainWindow):
                 border: 3px solid gray;
                 border-radius: 5px;
                 color: white;
-                font-family: SimSun;
+                font-family: Microsoft YaHei UI;
                 font-size:25px;
             }
             QPushButton:hover{
@@ -540,8 +589,7 @@ class MainUI(QtWidgets.QMainWindow):
                 border-radius: 5px;
                 border-color: rgb(65,65,65);
                 color: white;
-                font-family: Arial;
-                font-family: SimSun;
+                font-family: Microsoft YaHei UI;
             }
             QPushButton:pressed{
                 background-color: rgb(1,1,1);
@@ -549,15 +597,14 @@ class MainUI(QtWidgets.QMainWindow):
                 border-radius: 5px;
                 border-color: rgb(1,1,1);
                 color: white;
-                font-family: Arial;
-                font-family: SimSun;
+                font-family: Microsoft YaHei UI;
             }
         ''')
         self.empty_msgbox.addButton(confirm_button, QtWidgets.QMessageBox.YesRole)
         self.empty_msgbox.addButton(cancle_button, QtWidgets.QMessageBox.NoRole)
         self.empty_msgbox.setStyleSheet('''
             QMessageBox{
-                font-family:SimHei;
+                font-family:Microsoft YaHei UI;
                 font-size:25px;
                 background-color:white;
                 border:5px solid gray;
@@ -569,6 +616,8 @@ class MainUI(QtWidgets.QMainWindow):
         if self.empty_msgbox == QtWidgets.QMessageBox.Yes:
             self.on_button_reset_input_box()
         elif self.empty_msgbox == QtWidgets.QMessageBox.Cancel:
+            self.on_button_reset_input_box()
+        else:
             self.on_button_reset_input_box()
 
     def not_found_msg_box(self):
@@ -583,7 +632,7 @@ class MainUI(QtWidgets.QMainWindow):
                 border: 3px solid gray;
                 border-radius: 5px;
                 color: white;
-                font-family: SimSun;
+                font-family: Microsoft YaHei UI;
                 font-size:25px;
             }
             QPushButton:hover{
@@ -592,8 +641,7 @@ class MainUI(QtWidgets.QMainWindow):
                 border-radius: 5px;
                 border-color: rgb(65,65,65);
                 color: white;
-                font-family: Arial;
-                font-family: SimSun;
+                font-family: Microsoft YaHei UI;
             }
             QPushButton:pressed{
                 background-color: rgb(1,1,1);
@@ -601,8 +649,7 @@ class MainUI(QtWidgets.QMainWindow):
                 border-radius: 5px;
                 border-color: rgb(1,1,1);
                 color: white;
-                font-family: Arial;
-                font-family: SimSun;
+                font-family: Microsoft YaHei UI;
             }
         ''')
         cancle_button.setStyleSheet('''
@@ -611,7 +658,7 @@ class MainUI(QtWidgets.QMainWindow):
                 border: 3px solid gray;
                 border-radius: 5px;
                 color: white;
-                font-family: SimSun;
+                font-family: Microsoft YaHei UI;
                 font-size:25px;
             }
             QPushButton:hover{
@@ -620,8 +667,7 @@ class MainUI(QtWidgets.QMainWindow):
                 border-radius: 5px;
                 border-color: rgb(65,65,65);
                 color: white;
-                font-family: Arial;
-                font-family: SimSun;
+                font-family: Microsoft YaHei UI;
             }
             QPushButton:pressed{
                 background-color: rgb(1,1,1);
@@ -629,15 +675,14 @@ class MainUI(QtWidgets.QMainWindow):
                 border-radius: 5px;
                 border-color: rgb(1,1,1);
                 color: white;
-                font-family: Arial;
-                font-family: SimSun;
+                font-family: Microsoft YaHei UI;
             }
         ''')
         self.not_found_msgbox.addButton(confirm_button, QtWidgets.QMessageBox.YesRole)
         self.not_found_msgbox.addButton(cancle_button, QtWidgets.QMessageBox.NoRole)
         self.not_found_msgbox.setStyleSheet('''
             QMessageBox{
-                font-family:SimHei;
+                font-family:Microsoft YaHei UI;
                 font-size:25px;
                 background-color:white;
                 border:5px solid gray;
@@ -650,6 +695,8 @@ class MainUI(QtWidgets.QMainWindow):
             self.on_button_reset_input_box()
         elif self.not_found_msgbox == QtWidgets.QMessageBox.Cancel:
             self.on_button_reset_input_box()
+        else:
+            self.on_button_reset_input_box()
 
     def error_format_msg_box(self):
         self.error_format_msgbox = QtWidgets.QMessageBox()
@@ -658,72 +705,68 @@ class MainUI(QtWidgets.QMainWindow):
         confirm_button = QtWidgets.QPushButton("确定")
         cancle_button = QtWidgets.QPushButton("取消")
         confirm_button.setStyleSheet('''
-                    QPushButton{
-                        background-color: gray;
-                        border: 3px solid gray;
-                        border-radius: 5px;
-                        color: white;
-                        font-family: SimSun;
-                        font-size:25px;
-                    }
-                    QPushButton:hover{
-                        background-color: rgb(65,65,65);
-                        border: 3px solid gray;
-                        border-radius: 5px;
-                        border-color: rgb(65,65,65);
-                        color: white;
-                        font-family: Arial;
-                        font-family: SimSun;
-                    }
-                    QPushButton:pressed{
-                        background-color: rgb(1,1,1);
-                        border: 3px solid gray;
-                        border-radius: 5px;
-                        border-color: rgb(1,1,1);
-                        color: white;
-                        font-family: Arial;
-                        font-family: SimSun;
-                    }
-                ''')
+            QPushButton{
+                background-color: gray;
+                border: 3px solid gray;
+                border-radius: 5px;
+                color: white;
+                font-family: Microsoft YaHei UI;
+                font-size:25px;
+            }
+            QPushButton:hover{
+                background-color: rgb(65,65,65);
+                border: 3px solid gray;
+                border-radius: 5px;
+                border-color: rgb(65,65,65);
+                color: white;
+                font-family: Microsoft YaHei UI;
+            }
+            QPushButton:pressed{
+                background-color: rgb(1,1,1);
+                border: 3px solid gray;
+                border-radius: 5px;
+                border-color: rgb(1,1,1);
+                color: white;
+                font-family: Microsoft YaHei UI;
+            }
+        ''')
         cancle_button.setStyleSheet('''
-                    QPushButton{
-                        background-color: gray;
-                        border: 3px solid gray;
-                        border-radius: 5px;
-                        color: white;
-                        font-family: SimSun;
-                        font-size:25px;
-                    }
-                    QPushButton:hover{
-                        background-color: rgb(65,65,65);
-                        border: 3px solid gray;
-                        border-radius: 5px;
-                        border-color: rgb(65,65,65);
-                        color: white;
-                        font-family: Arial;
-                        font-family: SimSun;
-                    }
-                    QPushButton:pressed{
-                        background-color: rgb(1,1,1);
-                        border: 3px solid gray;
-                        border-radius: 5px;
-                        border-color: rgb(1,1,1);
-                        color: white;
-                        font-family: Arial;
-                        font-family: SimSun;
-                    }
-                ''')
+            QPushButton{
+                background-color: gray;
+                border: 3px solid gray;
+                border-radius: 5px;
+                color: white;
+                font-family: Microsoft YaHei UI;
+                font-size:25px;
+            }
+            QPushButton:hover{
+                background-color: rgb(65,65,65);
+                border: 3px solid gray;
+                border-radius: 5px;
+                border-color: rgb(65,65,65);
+                color: white;
+                font-family: Microsoft YaHei UI;
+            }
+            QPushButton:pressed{
+                background-color: rgb(1,1,1);
+                border: 3px solid gray;
+                border-radius: 5px;
+                border-color: rgb(1,1,1);
+                color: white;
+                font-family: Microsoft YaHei UI;
+            }
+        ''')
         self.error_format_msgbox.addButton(confirm_button, QtWidgets.QMessageBox.YesRole)
         self.error_format_msgbox.addButton(cancle_button, QtWidgets.QMessageBox.NoRole)
         self.error_format_msgbox.setStyleSheet('''
-                    QMessageBox{
-                        font-family:SimHei;
-                        font-size:25px;
-                        background-color:white;
-                        border:5px solid gray;
-                        border-radius:10px;
-                    }
-                ''')
+            QMessageBox{
+                font-family:Microsoft YaHei UI;
+                font-size:25px;
+                background-color:white;
+                border:5px solid gray;
+                border-radius:10px;
+            }
+        ''')
         self.error_format_msgbox.setWindowFlag(QtCore.Qt.FramelessWindowHint)  # 隐藏边框
         self.error_format_msgbox.exec_()
         if self.error_format_msgbox == QtWidgets.QMessageBox.Yes:
@@ -731,6 +774,84 @@ class MainUI(QtWidgets.QMainWindow):
         elif self.error_format_msgbox == QtWidgets.QMessageBox.Cancel:
             self.on_button_reset_input_box()
             return
+        else:
+            self.on_button_reset_input_box()
+
+    def export_error_msg_box(self):
+        self.error_format_msgbox = QtWidgets.QMessageBox()
+        self.error_format_msgbox.setWindowTitle("错误")
+        self.error_format_msgbox.setText("当前输出框为空，无法导出！！")
+        confirm_button = QtWidgets.QPushButton("确定")
+        cancle_button = QtWidgets.QPushButton("取消")
+        confirm_button.setStyleSheet('''
+            QPushButton{
+                width: 60px;
+                height: 30px;
+                background-color: gray;
+                border: 3px solid gray;
+                border-radius: 5px;
+                color: white;
+                font-family: Microsoft YaHei UI;
+                font-size:20px;
+            }
+            QPushButton:hover{
+                background-color: rgb(65,65,65);
+                border: 3px solid gray;
+                border-radius: 5px;
+                border-color: rgb(65,65,65);
+                color: white;
+                font-family: Microsoft YaHei UI;
+            }
+            QPushButton:pressed{
+                background-color: rgb(1,1,1);
+                border: 3px solid gray;
+                border-radius: 5px;
+                border-color: rgb(1,1,1);
+                color: white;
+                font-family: Microsoft YaHei UI;
+            }
+        ''')
+        cancle_button.setStyleSheet('''
+            QPushButton{
+                width: 60px;
+                height: 30px;
+                background-color: gray;
+                border: 3px solid gray;
+                border-radius: 5px;
+                color: white;
+                font-family: Microsoft YaHei UI;
+                font-size:20px;
+            }
+            QPushButton:hover{
+                background-color: rgb(65,65,65);
+                border: 3px solid gray;
+                border-radius: 5px;
+                border-color: rgb(65,65,65);
+                color: white;
+                font-family: Microsoft YaHei UI;
+            }
+            QPushButton:pressed{
+                background-color: rgb(1,1,1);
+                border: 3px solid gray;
+                border-radius: 5px;
+                border-color: rgb(1,1,1);
+                color: white;
+                font-family: Microsoft YaHei UI;
+            }
+        ''')
+        self.error_format_msgbox.addButton(confirm_button, QtWidgets.QMessageBox.YesRole)
+        self.error_format_msgbox.addButton(cancle_button, QtWidgets.QMessageBox.NoRole)
+        self.error_format_msgbox.setStyleSheet('''
+            QMessageBox{
+                font-family:Microsoft YaHei UI;
+                font-size:25px;
+                background-color:white;
+                border:5px solid gray;
+                border-radius:10px;
+            }
+        ''')
+        self.error_format_msgbox.setWindowFlag(QtCore.Qt.FramelessWindowHint)  # 隐藏边框
+        self.error_format_msgbox.exec_()
 
     def find_factor_num_in_normal_table(self, factor_num_str, table):
         result = []
@@ -743,6 +864,10 @@ class MainUI(QtWidgets.QMainWindow):
                     self.formated_list.append(_str)
                 continue
             self.formated_list.append(str_splited)
+        print(self.formated_list)
+        if self.formated_list[1] == '':
+            self.error_format_msg_box()
+            return
         input_level_num = int(self.formated_list[0])
         input_factor_num = int(self.formated_list[1])
         for index, line in enumerate(table):
@@ -760,6 +885,16 @@ class MainUI(QtWidgets.QMainWindow):
             return None
         return result
 
+    def on_close_program(self):
+        app = QtWidgets.QApplication.instance()
+        app.quit()
+
+    def on_minmize_window(self):
+        self.main_widget.setWindowState(QtCore.Qt.WindowMinimized)
+
+    def on_maxmize_window(self):
+        self.main_widget.setWindowState(QtCore.Qt.WindowMaximized)
+
     def on_commit_factor_num(self):
         self.factor_num = self.right_search_widget_input.text()
         self.factor_level = self.factor_box.toPlainText()
@@ -768,6 +903,11 @@ class MainUI(QtWidgets.QMainWindow):
             if self.factor_level is '':
                 self.empty_msg_box()
                 return
+            if '\n' in self.factor_level:
+                self.factor_level = self.factor_level.strip()
+                print(self.factor_level)
+            if '，' in self.factor_level:
+                self.factor_level = self.factor_level.replace('，', ',')
             table = Tools.get_table()
             result = self.find_factor_num_in_normal_table(self.factor_num, table)
             # print(self.formated_list)
@@ -777,7 +917,7 @@ class MainUI(QtWidgets.QMainWindow):
             sample_list = []
             factor_list = []
             outputs = []
-            final_result = ""
+            self.final_result = ""
             factor_num_sum = sum([int(x) for x in self.formated_list[1::2]])
             for sample in result:
                 if len(sample) - 1 == factor_num_sum:
@@ -787,13 +927,12 @@ class MainUI(QtWidgets.QMainWindow):
                     sample_list.append(_sample)
                 else:
                     sample_list.append([int(x) for x in sample])
-            self.factor_level = self.factor_box.toPlainText()
+            # self.factor_level = self.factor_box.toPlainText()
             self.factor_level = re.split("\n", self.factor_level)
+            # self.factor_level.remove('')
             for factor in self.factor_level:
                 factor_list.append(factor.split(','))
 
-            # print(sample_list)
-            # print(factor_list)
             if len(factor_list) != factor_num_sum:
                 self.error_format_msg_box()
                 return
@@ -805,13 +944,86 @@ class MainUI(QtWidgets.QMainWindow):
             for _result in outputs:
                 for i, __result in enumerate(_result):
                     if i == len(_result) - 1:
-                        final_result += (__result + "\n")
+                        self.final_result += (__result + "\n")
                         continue
-                    final_result += (__result + ",")
-            print(final_result)
-            self.output_box.setPlainText(final_result)
+                    self.final_result += (__result + ",")
+            print(self.final_result)
+            self.output_box.setPlainText(self.final_result)
         else:
             self.error_msg_box()
+
+    def on_about_msg_box(self):
+        self.about_button_msgbox = QtWidgets.QMessageBox()
+        self.about_button_msgbox.setWindowTitle("错误")
+        self.about_button_msgbox.setText(
+            "\n   本工具由1900301236谢浚霖开发，可以实现根据正交表以及输入的水平数和因素数自动生成测试用例。\n\n\n\n\nPommesPeter\t\nEmail:me@pommespeter.com\t\nGithub ID: PommesPeter\t\nTencentQQ: 434596665")
+        confirm_button = QtWidgets.QPushButton("确定")
+        confirm_button.setStyleSheet('''
+            QPushButton{
+                width: 60px;
+                height: 30px;
+                background-color: gray;
+                border: 3px solid gray;
+                border-radius: 5px;
+                color: white;
+                font-family: Microsoft YaHei UI;
+                font-size:20px;
+            }
+            QPushButton:hover{
+                background-color: rgb(65,65,65);
+                border: 3px solid gray;
+                border-radius: 5px;
+                border-color: rgb(65,65,65);
+                color: white;
+                font-family: Microsoft YaHei UI;
+            }
+            QPushButton:pressed{
+                background-color: rgb(1,1,1);
+                border: 3px solid gray;
+                border-radius: 5px;
+                border-color: rgb(1,1,1);
+                color: white;
+                font-family: Microsoft YaHei UI;
+            }
+        ''')
+        self.about_button_msgbox.addButton(confirm_button, QtWidgets.QMessageBox.YesRole)
+        self.about_button_msgbox.setStyleSheet('''
+            QMessageBox {
+                font-family:Microsoft YaHei UI;
+                font-size:18px;
+                background-color:white;
+                border:5px solid gray;
+                border-radius:10px;
+            }
+        ''')
+        self.about_button_msgbox.setWindowFlag(QtCore.Qt.FramelessWindowHint)  # 隐藏边框
+        self.about_button_msgbox.exec_()
+
+    def on_import_factor_button(self):
+        self.factor_level = ""
+        file_name, _ = QtWidgets.QFileDialog.getOpenFileName(self, '请选择水平和因素文件', '', 'csv Files (*.csv)')
+        if file_name == '':
+            return
+        with open(file_name, 'r') as f:
+            lines = f.readlines()
+        print(lines)
+        self.right_search_widget_input.setText(lines[0].split('\n')[0])
+        for line in lines[1:]:
+            self.factor_level += line
+        self.factor_box.setPlainText(self.factor_level)
+
+    def on_export_sample_button(self):
+        if self.final_result == '':
+            self.export_error_msg_box()
+            return
+        save_path = QtWidgets.QFileDialog.getExistingDirectory(self, "选择保存路径", "./")
+        file_list = os.listdir(save_path)
+        print(save_path)
+        if save_path == '':
+            return
+        with open(os.path.join(save_path, 'output' + str(len(file_list)) + '.csv'), 'a') as f:
+            print(self.final_result, file=f)
+
 
 
 class Tools:
