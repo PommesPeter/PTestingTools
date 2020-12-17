@@ -4,6 +4,7 @@ import qtawesome
 from PyQt5 import QtCore, QtWidgets
 
 from gui_utils.custom_widgets import myQLineEdit
+from gui_utils.thread_ui import UI_Thread
 
 
 class MainUI(QtWidgets.QMainWindow):
@@ -78,6 +79,8 @@ class MainUI(QtWidgets.QMainWindow):
         self.init_button()
         self.init_main_page()
         self.init_generating_table_page()
+        self.thread_ui = UI_Thread()
+
         # self.init_input_box()
 
     def init_button(self):
@@ -172,8 +175,8 @@ class MainUI(QtWidgets.QMainWindow):
             }
             ''')
         # self.right_search_widget_input.returnPressed.connect(self.on_lineEdit_enter)
-        self.right_bar_layout.addWidget(self.search_icon, 0, 0, 1, 1)
-        self.right_bar_layout.addWidget(self.right_search_widget_input, 0, 1, 1, 8)
+        # self.right_bar_layout.addWidget(self.search_icon, 0, 0, 1, 1)
+        # self.right_bar_layout.addWidget(self.right_search_widget_input, 0, 1, 1, 8)
 
         self.right_layout.addWidget(self.right_bar_widget, 0, 0, 1, 9)
 
@@ -246,7 +249,6 @@ class MainUI(QtWidgets.QMainWindow):
         self.search_icon.setFont(qtawesome.font('fa', 20))
         self.search_icon.setStyleSheet('''
             QLabel{
-                padding:2px 4px;
                 margin-top: 40px;
             }
         ''')
@@ -256,9 +258,8 @@ class MainUI(QtWidgets.QMainWindow):
             '''
             QLineEdit{
                     border:1px solid gray;
-                    width:200px;
+                    width:250px;
                     border-radius:10px;
-                    padding:2px 4px;
                     margin-top: 30px;
                     font-size: 25px;
                     font-family: SimHei;
@@ -295,7 +296,7 @@ class MainUI(QtWidgets.QMainWindow):
            }
         ''')
 
-        self.factor_box_label = QtWidgets.QLabel("水平^因素框")
+        self.factor_box_label = QtWidgets.QLabel("水平因素框")
         self.factor_box_label.setStyleSheet('''
             QLabel {
                 font-family: SimHei;
@@ -343,60 +344,119 @@ class MainUI(QtWidgets.QMainWindow):
                 font-family: SimSun;
             }
         ''')
+
+        self.reset_button = QtWidgets.QPushButton("重置")
+        self.reset_button.setObjectName("reset_button")
+        self.reset_button.setStyleSheet('''
+                    QPushButton#reset_button{
+                        width: 30px;
+                        height: 40px;
+                        background-color: gray;
+                        border: 3px solid gray;
+                        border-radius: 5px;
+                        color: white;
+                        font-family: SimSun;
+                        font-size: 30px;
+                    }
+                    QPushButton#reset_button:hover{
+                        width: 30px;
+                        background-color: rgb(65,65,65);
+                        border: 3px solid gray;
+                        border-radius: 5px;
+                        border-color: rgb(65,65,65);
+                        color: white;
+                        font-family: Arial;
+                        font-family: SimSun;
+                    }
+                    QPushButton#reset_button:pressed{
+                        width: 30px;
+                        background-color: rgb(1,1,1);
+                        border: 3px solid gray;
+                        border-radius: 5px;
+                        border-color: rgb(1,1,1);
+                        color: white;
+                        font-family: Arial;
+                        font-family: SimSun;
+                    }
+                ''')
+
         self.commit_button.clicked.connect(self.on_commit_factor_num)
-        self.right_bar_layout.addWidget(self.right_search_widget_input, 1, 1, 1, 9)
+        self.reset_button.clicked.connect(self.on_button_reset_input_box)
         self.right_bar_layout.addWidget(self.search_icon, 1, 0, 1, 1)
+        self.right_bar_layout.addWidget(self.right_search_widget_input, 1, 1, 1, 5)
         self.right_bar_layout.addWidget(self.factor_box_label, 2, 0, 1, 1)
         self.right_bar_layout.addWidget(self.output_box_label, 2, 2, 1, 1)
         self.right_bar_layout.addWidget(self.factor_box, 3, 0, 3, 1)
         self.right_bar_layout.addWidget(self.output_box, 3, 2, 3, 1)
-        self.right_layout.addWidget(self.commit_button, 6, 3, 1, 4)
+        self.right_layout.addWidget(self.commit_button, 6, 1, 1, 3)
+        self.right_layout.addWidget(self.reset_button, 6, 5, 1, 3)
 
         self.right_layout.addWidget(self.right_bar_widget, 0, 0, 1, 9)
         self.right_bar_widget.setVisible(False)
         self.commit_button.setVisible(False)
-
-    def on_button_main_page_switch(self):
-        self.right_bar_widget.setVisible(False)
-        self.right_subwidgets.setVisible(True)
-        self.title_widget.setVisible(True)
-        self.commit_button.setVisible(False)
-
-    def error_msg_box(self):
-        self.error_msgbox = QtWidgets.QMessageBox.warning(self, "Error", "输入格式有误，请重新输入！！",
-                                                          QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.Cancel,
-                                                          QtWidgets.QMessageBox.Ok)
-        if self.error_msgbox == QtWidgets.QMessageBox.Ok:
-            self.factor_box.setText("")
-            self.output_box.setText("")
-            self.right_search_widget_input.setText("")
-        elif self.error_msgbox == QtWidgets.QMessageBox.Cancel:
-            self.factor_box.setText("")
-            self.output_box.setText("")
-            self.right_search_widget_input.setText("")
-            return
-
-    def empty_msg_box(self):
-        self.empty_msgbox = QtWidgets.QMessageBox.warning(self, "Error", "输入为空，请重新输入！！",
-                                                          QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.Cancel,
-                                                          QtWidgets.QMessageBox.Ok)
-        if self.empty_msgbox == QtWidgets.QMessageBox.Ok:
-            self.factor_box.setText("")
-            self.output_box.setText("")
-            self.right_search_widget_input.setText("")
-        elif self.error_msgbox == QtWidgets.QMessageBox.Cancel:
-            self.factor_box.setText("")
-            self.output_box.setText("")
-            self.right_search_widget_input.setText("")
-            return
+        self.reset_button.setVisible(False)
 
     def on_button_generating_table_page_switch(self):
         self.right_bar_widget.setVisible(True)
         self.commit_button.setVisible(True)
+        self.reset_button.setVisible(True)
         self.title_widget.setVisible(False)
         self.right_subwidgets.setVisible(False)
 
+    def on_button_main_page_switch(self):
+        self.right_bar_widget.setVisible(False)
+        self.commit_button.setVisible(False)
+        self.reset_button.setVisible(False)
+        self.right_subwidgets.setVisible(True)
+        self.title_widget.setVisible(True)
+
+    def on_button_reset_input_box(self):
+        self.factor_box.setPlainText("")
+        self.output_box.setPlainText("")
+        self.right_search_widget_input.setText("")
+
+    def error_msg_box(self):
+        # self.error_msgbox = QtWidgets.QMessageBox.warning(self, "Error", "输入格式有误，请重新输入！！",
+        #                                                   QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.Cancel,
+        #                                                   QtWidgets.QMessageBox.Ok)
+        self.error_msgbox = QtWidgets.QMessageBox()
+        self.error_msgbox.setWindowTitle("错误")
+        self.error_msgbox.setText("输入格式有误，请重新输入！！")
+        self.error_msgbox.addButton(QtWidgets.QPushButton("确定"), QtWidgets.QMessageBox.YesRole)
+        self.error_msgbox.addButton(QtWidgets.QPushButton("取消"), QtWidgets.QMessageBox.NoRole)
+        self.error_msgbox.exec_()
+        if self.error_msgbox == QtWidgets.QMessageBox.Ok:
+            self.factor_box.setPlainText("")
+            self.output_box.setPlainText("")
+            self.right_search_widget_input.setText("")
+        elif self.error_msgbox == QtWidgets.QMessageBox.Cancel:
+            self.factor_box.setPlainText("")
+            self.output_box.setPlainText("")
+            self.right_search_widget_input.setText("")
+            return
+
+    def empty_msg_box(self):
+        # self.empty_msgbox = QtWidgets.QMessageBox.warning(self, "Error", "水平因素框输入为空，请重新输入！！",
+        #                                                   QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.Cancel,
+        #                                                   QtWidgets.QMessageBox.Ok)
+        self.empty_msgbox = QtWidgets.QMessageBox()
+        self.empty_msgbox.setWindowTitle("错误")
+        self.empty_msgbox.setText("水平因素框输入为空，请重新输入！！")
+        self.empty_msgbox.addButton(QtWidgets.QPushButton("确定"), QtWidgets.QMessageBox.YesRole)
+        self.empty_msgbox.addButton(QtWidgets.QPushButton("取消"), QtWidgets.QMessageBox.NoRole)
+        self.empty_msgbox.exec_()
+        if self.empty_msgbox == QtWidgets.QMessageBox.Yes:
+            self.factor_box.setPlainText("")
+            self.output_box.setPlainText("")
+            self.right_search_widget_input.setText("")
+        elif self.empty_msgbox == QtWidgets.QMessageBox.Cancel:
+            self.factor_box.setPlainText("")
+            self.output_box.setPlainText("")
+            self.right_search_widget_input.setText("")
+            return
+
     def on_commit_factor_num(self):
+        # self.thread_ui.start()
         self.factor_num = self.right_search_widget_input.text()
         self.factor_level = self.factor_box.toPlainText()
         if '^' in self.factor_num:
