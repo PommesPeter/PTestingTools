@@ -12,6 +12,7 @@ class MainUI(QtWidgets.QMainWindow):
         super(MainUI, self).__init__()
         self.factor_level = ""
         self.final_result = ""
+        self.query_result = ""
         self.setFixedSize(1270, 800)
         self.main_widget = QtWidgets.QWidget()
         self.main_layout = QtWidgets.QGridLayout()
@@ -484,7 +485,7 @@ class MainUI(QtWidgets.QMainWindow):
                font-family: Microsoft YaHei UI;
            }
         ''')
-        self.output_box_label = QtWidgets.QLabel("样例生成框")
+        self.output_box_label = QtWidgets.QLabel("正交表查询结果")
         self.output_box_label.setStyleSheet('''
             QLabel {
                 font-family: Microsoft YaHei UI;
@@ -1037,7 +1038,7 @@ class MainUI(QtWidgets.QMainWindow):
         self.error_format_msgbox.setWindowFlag(QtCore.Qt.FramelessWindowHint)  # 隐藏边框
         self.error_format_msgbox.exec_()
 
-    def find_factor_num_in_normal_table(self, factor_num_str, table):
+    def find_factor_num_in_table(self, factor_num_str, table):
         result = []
         self.formated_list = []
         factor_num_str_splited = factor_num_str.split('^')
@@ -1093,7 +1094,7 @@ class MainUI(QtWidgets.QMainWindow):
             if '，' in self.factor_level:
                 self.factor_level = self.factor_level.replace('，', ',')
             table = Tools.get_table()
-            result = self.find_factor_num_in_normal_table(self.factor_num, table)
+            result = self.find_factor_num_in_table(self.factor_num, table)
             # print(self.formated_list)
             if result is None:
                 self.not_found_msg_box()
@@ -1137,7 +1138,20 @@ class MainUI(QtWidgets.QMainWindow):
             self.error_msg_box()
 
     def on_query_table(self):
-        print(1)
+        self.query_result = ""
+        self.factor_num = self.right_query_input.text()
+        print(self.factor_num)
+        if '^' in self.factor_num:
+            table = Tools.get_table()
+            result = self.find_factor_num_in_table(self.factor_num, table)
+            if result is None:
+                self.not_found_msg_box()
+                return
+            for i, _result in enumerate(result):
+                self.query_result += (_result + '\n')
+            self.result_box.setPlainText(self.query_result)
+        else:
+            self.error_msg_box()
 
     def on_about_msg_box(self):
         self.about_button_msgbox = QtWidgets.QMessageBox()
@@ -1204,15 +1218,22 @@ class MainUI(QtWidgets.QMainWindow):
             self.export_error_msg_box()
             return
         save_path = QtWidgets.QFileDialog.getExistingDirectory(self, "选择保存路径", "./")
-        file_list = os.listdir(save_path)
-        print(save_path)
         if save_path == '':
             return
-        with open(os.path.join(save_path, 'output' + str(len(file_list)) + '.csv'), 'a') as f:
+        file_list = os.listdir(save_path)
+        with open(os.path.join(save_path, 'output_' + str(len(file_list)) + '.csv'), 'a') as f:
             print(self.final_result, file=f)
 
     def on_export_table_button(self):
-        pass
+        if self.query_result == '':
+            self.export_error_msg_box()
+            return
+        save_path = QtWidgets.QFileDialog.getExistingDirectory(self, "选择保存路径", './')
+        if save_path == '':
+            return
+        file_list = os.listdir(save_path)
+        with open(os.path.join(save_path, 'output_table_' + str(len(file_list)) + '.csv'), 'a') as f:
+            print(self.query_result, file=f)
 
 
 class Tools:
