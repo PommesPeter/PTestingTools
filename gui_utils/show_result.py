@@ -2,7 +2,7 @@ from PyQt5 import QtCore, QtWidgets
 
 
 def load_table():
-    with open("/home/pommespeter/workspace/Pwidgets/data/table.txt", 'r') as f:
+    with open("/home/pommespeter/workspace/Pwidgets/data/ts723_Designs.txt", 'r') as f:
         lines = f.readlines()
         print(lines)
     return lines
