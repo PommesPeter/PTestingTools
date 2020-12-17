@@ -485,9 +485,9 @@ class MainUI(QtWidgets.QMainWindow):
             }
         ''')
         self.error_msgbox.exec_()
-        if self.error_msgbox == QtWidgets.QMessageBox.Ok:
+        if self.error_msgbox == QtWidgets.QMessageBox.Yes:
             self.on_button_reset_input_box()
-        elif self.error_msgbox == QtWidgets.QMessageBox.Cancel:
+        elif self.error_msgbox == QtWidgets.QMessageBox.No:
             self.on_button_reset_input_box()
             return
 
@@ -654,7 +654,7 @@ class MainUI(QtWidgets.QMainWindow):
     def error_format_msg_box(self):
         self.error_format_msgbox = QtWidgets.QMessageBox()
         self.error_format_msgbox.setWindowTitle("错误")
-        self.error_format_msgbox.setText("水平因素数输入错误，请重新输入！！")
+        self.error_format_msgbox.setText("输入的因素和水平数与水平^因素框中的不符，请重新输入！！")
         confirm_button = QtWidgets.QPushButton("确定")
         cancle_button = QtWidgets.QPushButton("取消")
         confirm_button.setStyleSheet('''
@@ -734,22 +734,19 @@ class MainUI(QtWidgets.QMainWindow):
 
     def find_factor_num_in_normal_table(self, factor_num_str, table):
         result = []
-        formated_list = []
+        self.formated_list = []
         factor_num_str_splited = factor_num_str.split('^')
         for str_splited in factor_num_str_splited:
             if len(str_splited) > 1:
                 str_splited = str_splited.split(' ')
-                print(str_splited)
                 for _str in str_splited:
-                    formated_list.append(_str)
+                    self.formated_list.append(_str)
                 continue
-            formated_list.append(str_splited)
-        # print(formated_list)
-        input_level_num = int(formated_list[0])
-        input_factor_num = int(formated_list[1])
+            self.formated_list.append(str_splited)
+        input_level_num = int(self.formated_list[0])
+        input_factor_num = int(self.formated_list[1])
         for index, line in enumerate(table):
             if '^' in line:
-                print(line)
                 table_len = int(line.split(' ')[-1].split('\n')[0].split('n=')[-1])
                 self.table_len = table_len
                 table_factor_num = line.split(' ')[0]
@@ -773,6 +770,7 @@ class MainUI(QtWidgets.QMainWindow):
                 return
             table = Tools.get_table()
             result = self.find_factor_num_in_normal_table(self.factor_num, table)
+            # print(self.formated_list)
             if result is None:
                 self.not_found_msg_box()
                 return
@@ -780,19 +778,28 @@ class MainUI(QtWidgets.QMainWindow):
             factor_list = []
             outputs = []
             final_result = ""
+            factor_num_sum = sum([int(x) for x in self.formated_list[1::2]])
             for sample in result:
-                sample_list.append([int(x) for x in sample])
+                if len(sample) - 1 == factor_num_sum:
+                    # print(sample[:-2])
+                    _sample = [int(x) for x in sample[:-2]]
+                    _sample += [int(sample[-2:])]
+                    sample_list.append(_sample)
+                else:
+                    sample_list.append([int(x) for x in sample])
             self.factor_level = self.factor_box.toPlainText()
             self.factor_level = re.split("\n", self.factor_level)
             for factor in self.factor_level:
                 factor_list.append(factor.split(','))
 
-            print(sample_list)
-            print(factor_list)
-
-            for samle in sample_list:
+            # print(sample_list)
+            # print(factor_list)
+            if len(factor_list) != factor_num_sum:
+                self.error_format_msg_box()
+                return
+            for sample in sample_list:
                 output = []
-                for i, index in enumerate(samle):
+                for i, index in enumerate(sample):
                     output.append(factor_list[i][index])
                 outputs.append(output)
             for _result in outputs:

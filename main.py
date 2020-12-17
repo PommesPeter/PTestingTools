@@ -32,10 +32,10 @@ i3,i5,i7,AMD
 
 3^4
 4个3
-IIS Apache Jetty
-win10 Linux win7
-无 小程序 微信插件
-IE11 Chrome Firefox
+IIS,Apache,Jetty
+win10,Linux,win7
+无,小程序,微信插件
+IE11,Chrome,Firefox
 
 IIS Apache Jetty  
 win10 Linux win7
