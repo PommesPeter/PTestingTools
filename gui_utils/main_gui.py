@@ -1,7 +1,8 @@
 # coding: utf-8
 
-import re
 import os
+import re
+
 import qtawesome
 from PyQt5 import QtCore, QtWidgets, QtGui
 
@@ -80,6 +81,7 @@ class MainUI(QtWidgets.QMainWindow):
         self.init_button()
         self.init_main_page()
         self.init_generating_table_page()
+        self.init_table_query_page()
 
     def init_button(self):
         self.left_close = QtWidgets.QPushButton("")
@@ -139,6 +141,7 @@ class MainUI(QtWidgets.QMainWindow):
         self.left_button_generating_table.clicked.connect(self.on_button_generating_table_page_switch)
         self.left_button_searching_table = QtWidgets.QPushButton(qtawesome.icon('fa.comment', color='white'), "正交表查询")
         self.left_button_searching_table.setObjectName('left_button')
+        self.left_button_searching_table.clicked.connect(self.on_button_query_page_switch)
         self.left_button_history_table = QtWidgets.QPushButton(qtawesome.icon('fa.history', color='white'), "历史记录")
         self.left_button_history_table.setObjectName('left_button')
 
@@ -167,7 +170,7 @@ class MainUI(QtWidgets.QMainWindow):
         # 添加组件，往right_software_title
         self.right_subwidgets.setLayout(self.right_subwidgets_layout)
 
-        self.img = QtGui.QPixmap('E:/Workspace/Python/Pwidgets/gui_utils/pic/1.png')
+        self.img = QtGui.QPixmap('E:/Workspace/Python/Pwidgets/gui_utils/pic/2.png')
         self.img_label = QtWidgets.QLabel()
         self.img_label.setObjectName("img_label")
         self.img_label.setPixmap(self.img)
@@ -441,24 +444,205 @@ class MainUI(QtWidgets.QMainWindow):
         self.commit_button.setVisible(False)
         self.reset_button.setVisible(False)
 
+    def init_table_query_page(self):
+
+        self.right_query_widget = QtWidgets.QFrame()
+        self.right_query_layout = QtWidgets.QGridLayout()
+        self.right_query_widget.setLayout(self.right_query_layout)
+
+        self.search_icon_query = QtWidgets.QLabel(chr(0xf002) + ' ' + '水平数^因素数  ')
+        self.search_icon_query.setFont(qtawesome.font('fa', 25))
+        self.search_icon_query.setStyleSheet('''
+            QLabel{
+                margin-top:30px;
+                font-size: 25px;
+            }
+        ''')
+        self.right_query_input = QtWidgets.QLineEdit()
+        self.right_query_input.setPlaceholderText("请输入水平数^因素数")
+        self.right_query_input.setStyleSheet('''
+            QLineEdit{
+                    border:1px solid gray;
+                    width:250px;
+                    border-radius:10px;
+                    margin-top: 30px;
+                    font-size: 25px;
+                    font-family: Microsoft YaHei UI;
+            }
+            ''')
+        self.result_box = QtWidgets.QPlainTextEdit(self)
+        self.result_box.setLayout(self.box_layout)
+        self.result_box.setPlaceholderText("查询的正交表在此处显示")
+        self.result_box.setReadOnly(True)
+        self.result_box.setStyleSheet('''
+           QPlainTextEdit{
+               border:3px solid gray;
+               height: 50px;
+               border-radius:5px;
+               padding 5px;
+               font-size: 25px;
+               font-family: Microsoft YaHei UI;
+           }
+        ''')
+        self.output_box_label = QtWidgets.QLabel("样例生成框")
+        self.output_box_label.setStyleSheet('''
+            QLabel {
+                font-family: Microsoft YaHei UI;
+                font-size: 30px;
+            }
+        ''')
+        self.query_button = QtWidgets.QPushButton("查找正交表")
+        self.query_button.setObjectName("query_button")
+        self.query_button.setStyleSheet('''
+            QPushButton#query_button{
+                width: 20px;
+                height: 40px;
+                background-color: gray;
+                border: 3px solid gray;
+                border-radius: 5px;
+                color: white;
+                font-family: Microsoft YaHei UI;
+                font-size: 25px;
+            }
+            QPushButton#query_button:hover{
+                width: 30px;
+                background-color: rgb(65,65,65);
+                border: 3px solid gray;
+                border-radius: 5px;
+                border-color: rgb(65,65,65);
+                color: white;
+                font-family: Microsoft YaHei UI;
+            }
+            QPushButton#query_button:pressed{
+                width: 30px;
+                background-color: rgb(1,1,1);
+                border: 3px solid gray;
+                border-radius: 5px;
+                border-color: rgb(1,1,1);
+                color: white;
+                font-family: Microsoft YaHei UI;
+            }
+        ''')
+        self.reset_query_button = QtWidgets.QPushButton("重置")
+        self.reset_query_button.setObjectName("reset_query_button")
+        self.reset_query_button.setStyleSheet('''
+            QPushButton#reset_query_button{
+                width: 20px;
+                height: 40px;
+                background-color: gray;
+                border: 3px solid gray;
+                border-radius: 5px;
+                color: white;
+                font-family: Microsoft YaHei UI;
+                font-size: 25px;
+            }
+            QPushButton#reset_query_button:hover{
+                width: 30px;
+                background-color: rgb(65,65,65);
+                border: 3px solid gray;
+                border-radius: 5px;
+                border-color: rgb(65,65,65);
+                color: white;
+                font-family: Microsoft YaHei UI;
+            }
+            QPushButton#reset_query_button:pressed{
+                width: 30px;
+                background-color: rgb(1,1,1);
+                border: 3px solid gray;
+                border-radius: 5px;
+                border-color: rgb(1,1,1);
+                color: white;
+                font-family: Microsoft YaHei UI;
+            }
+        ''')
+        self.export_query_button = QtWidgets.QPushButton("导出")
+        self.export_query_button.setObjectName("export_query_button")
+        self.query_button.clicked.connect(self.on_query_table)
+        self.reset_query_button.clicked.connect(self.on_button_reset_input_box_query)
+        self.export_query_button.clicked.connect(self.on_export_table_button)
+        self.export_query_button.setStyleSheet('''
+            QPushButton#export_query_button{
+                width: 20px;
+                height: 40px;
+                background-color: gray;
+                border: 3px solid gray;
+                border-radius: 5px;
+                color: white;
+                font-family: Microsoft YaHei UI;
+                font-size: 25px;
+            }
+            QPushButton#export_query_button:hover{
+                width: 20px;
+                height: 40px;
+                background-color: rgb(65,65,65);
+                border: 3px solid gray;
+                border-radius: 5px;
+                border-color: rgb(65,65,65);
+                color: white;
+                font-family: Microsoft YaHei UI;
+            }
+            QPushButton#export_query_button:pressed{
+                width: 20px;
+                height: 40px;
+                background-color: rgb(1,1,1);
+                border: 3px solid gray;
+                border-radius: 5px;
+                border-color: rgb(1,1,1);
+                color: white;
+                font-family: Microsoft YaHei UI;
+            }
+        ''')
+        self.right_query_layout.addWidget(self.search_icon_query, 1, 0, 1, 1)
+        self.right_query_layout.addWidget(self.right_query_input, 1, 1, 1, 5)
+        self.right_query_layout.addWidget(self.output_box_label, 2, 1, 1, 4)
+        self.right_query_layout.addWidget(self.export_query_button, 3, 4, 1, 1)
+        self.right_query_layout.addWidget(self.result_box, 4, 1, 1, 4)
+        self.right_layout.addWidget(self.query_button, 6, 1, 1, 3)
+        self.right_layout.addWidget(self.reset_query_button, 6, 5, 1, 3)
+
+        self.right_layout.addWidget(self.right_query_widget, 0, 0, 1, 9)
+        self.right_query_widget.setVisible(False)
+        self.query_button.setVisible(False)
+        self.reset_query_button.setVisible(False)
+
+
     def on_button_generating_table_page_switch(self):
         self.right_bar_widget.setVisible(True)
         self.commit_button.setVisible(True)
         self.reset_button.setVisible(True)
+        self.query_button.setVisible(False)
         # self.title_widget.setVisible(False)
+        self.right_query_widget.setVisible(False)
         self.right_subwidgets.setVisible(False)
+        self.reset_query_button.setVisible(False)
 
     def on_button_main_page_switch(self):
         self.right_bar_widget.setVisible(False)
         self.commit_button.setVisible(False)
         self.reset_button.setVisible(False)
+        self.right_query_widget.setVisible(False)
         self.right_subwidgets.setVisible(True)
+        self.query_button.setVisible(False)
+        self.reset_query_button.setVisible(False)
         # self.title_widget.setVisible(True)
+
+    def on_button_query_page_switch(self):
+        self.right_bar_widget.setVisible(False)
+        self.commit_button.setVisible(False)
+        self.reset_button.setVisible(False)
+        self.right_subwidgets.setVisible(False)
+        self.right_query_widget.setVisible(True)
+        self.query_button.setVisible(True)
+        self.reset_query_button.setVisible(True)
 
     def on_button_reset_input_box(self):
         self.factor_box.setPlainText("")
         self.output_box.setPlainText("")
         self.right_search_widget_input.setText("")
+
+    def on_button_reset_input_box_query(self):
+        self.result_box.setPlainText("")
+        self.right_query_input.setText("")
 
     def error_msg_box(self):
         self.error_msgbox = QtWidgets.QMessageBox()
@@ -952,6 +1136,9 @@ class MainUI(QtWidgets.QMainWindow):
         else:
             self.error_msg_box()
 
+    def on_query_table(self):
+        print(1)
+
     def on_about_msg_box(self):
         self.about_button_msgbox = QtWidgets.QMessageBox()
         self.about_button_msgbox.setWindowTitle("错误")
@@ -1024,6 +1211,8 @@ class MainUI(QtWidgets.QMainWindow):
         with open(os.path.join(save_path, 'output' + str(len(file_list)) + '.csv'), 'a') as f:
             print(self.final_result, file=f)
 
+    def on_export_table_button(self):
+        pass
 
 
 class Tools:
