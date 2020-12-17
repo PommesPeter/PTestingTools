@@ -1,8 +1,9 @@
 # coding: utf-8
 
 import re
+
 import qtawesome
-from PyQt5 import QtCore, QtWidgets
+from PyQt5 import QtCore, QtWidgets, QtGui
 
 from gui_utils.custom_widgets import myQLineEdit
 from gui_utils.thread_ui import UI_Thread
@@ -68,8 +69,8 @@ class MainUI(QtWidgets.QMainWindow):
         ''')
         self.right_widget.setLayout(self.right_layout)
 
-        self.main_layout.addWidget(self.left_widget, 0, 0, 12, 2)
-        self.main_layout.addWidget(self.right_widget, 0, 2, 12, 10)
+        self.main_layout.addWidget(self.left_widget, 1, 0, 12, 2)
+        self.main_layout.addWidget(self.right_widget, 1, 2, 12, 10)
         self.setCentralWidget(self.main_widget)
 
         self.setWindowOpacity(1)  # 设置窗口透明度
@@ -183,19 +184,23 @@ class MainUI(QtWidgets.QMainWindow):
         # 添加组件，往right_software_title
         self.right_subwidgets.setLayout(self.right_subwidgets_layout)
 
-        self.title_widget = QtWidgets.QLabel()
-        self.title_widget.setObjectName("title_label")
-        self.title_widget.setText("正交表查询工具")
-        self.title_widget.setAlignment(QtCore.Qt.AlignHCenter)
-        self.title_widget.setStyleSheet('''
-            QLabel#title_label {
-                border:none;
-                color: red;
-                font-size:30px;
-                font-family: SimSun;
-            }
-        '''
-                                        )
+        # self.title_widget = QtWidgets.QLabel()
+        # self.title_widget.setObjectName("title_label")
+        # self.title_widget.setText("正交表查询工具")
+        # self.title_widget.setAlignment(QtCore.Qt.AlignHCenter)
+        # self.title_widget.setStyleSheet('''
+        #     QLabel#title_label {
+        #         border:none;
+        #         color: red;
+        #         font-size:30px;
+        #         font-family: SimSun;
+        #     }
+        # ''')
+
+        self.img = QtGui.QPixmap('E:/Workspace/Python/Pwidgets/gui_utils/pic/1.png')
+        self.img_label = QtWidgets.QLabel()
+        self.img_label.setObjectName("img_label")
+        self.img_label.setPixmap(self.img)
 
         self.introduction_background = QtWidgets.QLabel()
         self.introduction_background.setObjectName("introduction_background")
@@ -218,14 +223,20 @@ class MainUI(QtWidgets.QMainWindow):
         self.introdcution_label_widget_2.setObjectName("troduction_label_2")
         self.introdcution_label_widget_2.setText(
             "PommesPeter\t\nEmail:me@pommespeter.com\t\nGithub ID: PommesPeter\t\nTencentQQ: 434596665")
-
+        self.introdcution_label_widget_2.setStyleSheet('''
+            QLabel{
+                font-family: SimSun;
+                font-size: 25px;
+            }
+        ''')
         self.introduction_label_widget.resize(50, 50)
         # self.introduction_label_widget_2.resize(50, 50)
-        self.right_subwidgets_layout.addWidget(self.title_widget, 2, 1, 2, 5)
-        self.right_subwidgets_layout.addWidget(self.introduction_label_widget, 3, 1, 1, 4)
-        self.right_subwidgets_layout.addWidget(self.introdcution_label_widget_2, 4, 1, 1, 4)
+        self.right_subwidgets_layout.addWidget(self.img_label, 1, 0, 1, 5)
+        # self.right_subwidgets_layout.addWidget(self.title_widget, 2, 1, 2, 5)
+        self.right_subwidgets_layout.addWidget(self.introduction_label_widget, 3, 1, 1, 3)
+        self.right_subwidgets_layout.addWidget(self.introdcution_label_widget_2, 4, 0, 1, 5)
         self.right_layout.addWidget(self.right_subwidgets, 0, 0, 1, 9)
-        self.right_layout.addWidget(self.title_widget, 0, 0, 1, 10)
+        # self.right_layout.addWidget(self.title_widget, 0, 0, 1, 10)
 
     def init_generating_table_page(self):
         self.right_bar_widget = QtWidgets.QFrame()
@@ -384,7 +395,7 @@ class MainUI(QtWidgets.QMainWindow):
         self.right_bar_widget.setVisible(True)
         self.commit_button.setVisible(True)
         self.reset_button.setVisible(True)
-        self.title_widget.setVisible(False)
+        # self.title_widget.setVisible(False)
         self.right_subwidgets.setVisible(False)
 
     def on_button_main_page_switch(self):
@@ -392,7 +403,7 @@ class MainUI(QtWidgets.QMainWindow):
         self.commit_button.setVisible(False)
         self.reset_button.setVisible(False)
         self.right_subwidgets.setVisible(True)
-        self.title_widget.setVisible(True)
+        # self.title_widget.setVisible(True)
 
     def on_button_reset_input_box(self):
         self.factor_box.setPlainText("")
@@ -475,13 +486,9 @@ class MainUI(QtWidgets.QMainWindow):
         ''')
         self.error_msgbox.exec_()
         if self.error_msgbox == QtWidgets.QMessageBox.Ok:
-            self.factor_box.setPlainText("")
-            self.output_box.setPlainText("")
-            self.right_search_widget_input.setText("")
+            self.on_button_reset_input_box()
         elif self.error_msgbox == QtWidgets.QMessageBox.Cancel:
-            self.factor_box.setPlainText("")
-            self.output_box.setPlainText("")
-            self.right_search_widget_input.setText("")
+            self.on_button_reset_input_box()
             return
 
     def empty_msg_box(self):
@@ -560,42 +567,215 @@ class MainUI(QtWidgets.QMainWindow):
         self.empty_msgbox.setWindowFlag(QtCore.Qt.FramelessWindowHint)  # 隐藏边框
         self.empty_msgbox.exec_()
         if self.empty_msgbox == QtWidgets.QMessageBox.Yes:
-            self.factor_box.setPlainText("")
-            self.output_box.setPlainText("")
-            self.right_search_widget_input.setText("")
+            self.on_button_reset_input_box()
         elif self.empty_msgbox == QtWidgets.QMessageBox.Cancel:
-            self.factor_box.setPlainText("")
-            self.output_box.setPlainText("")
-            self.right_search_widget_input.setText("")
+            self.on_button_reset_input_box()
+
+    def not_found_msg_box(self):
+        self.not_found_msgbox = QtWidgets.QMessageBox()
+        self.not_found_msgbox.setWindowTitle("错误")
+        self.not_found_msgbox.setText("输入的水平^因素数错误，未在正交表中找到，请重新输入！！")
+        confirm_button = QtWidgets.QPushButton("确定")
+        cancle_button = QtWidgets.QPushButton("取消")
+        confirm_button.setStyleSheet('''
+            QPushButton{
+                background-color: gray;
+                border: 3px solid gray;
+                border-radius: 5px;
+                color: white;
+                font-family: SimSun;
+                font-size:25px;
+            }
+            QPushButton:hover{
+                background-color: rgb(65,65,65);
+                border: 3px solid gray;
+                border-radius: 5px;
+                border-color: rgb(65,65,65);
+                color: white;
+                font-family: Arial;
+                font-family: SimSun;
+            }
+            QPushButton:pressed{
+                background-color: rgb(1,1,1);
+                border: 3px solid gray;
+                border-radius: 5px;
+                border-color: rgb(1,1,1);
+                color: white;
+                font-family: Arial;
+                font-family: SimSun;
+            }
+        ''')
+        cancle_button.setStyleSheet('''
+            QPushButton{
+                background-color: gray;
+                border: 3px solid gray;
+                border-radius: 5px;
+                color: white;
+                font-family: SimSun;
+                font-size:25px;
+            }
+            QPushButton:hover{
+                background-color: rgb(65,65,65);
+                border: 3px solid gray;
+                border-radius: 5px;
+                border-color: rgb(65,65,65);
+                color: white;
+                font-family: Arial;
+                font-family: SimSun;
+            }
+            QPushButton:pressed{
+                background-color: rgb(1,1,1);
+                border: 3px solid gray;
+                border-radius: 5px;
+                border-color: rgb(1,1,1);
+                color: white;
+                font-family: Arial;
+                font-family: SimSun;
+            }
+        ''')
+        self.not_found_msgbox.addButton(confirm_button, QtWidgets.QMessageBox.YesRole)
+        self.not_found_msgbox.addButton(cancle_button, QtWidgets.QMessageBox.NoRole)
+        self.not_found_msgbox.setStyleSheet('''
+            QMessageBox{
+                font-family:SimHei;
+                font-size:25px;
+                background-color:white;
+                border:5px solid gray;
+                border-radius:10px;
+            }
+        ''')
+        self.not_found_msgbox.setWindowFlag(QtCore.Qt.FramelessWindowHint)  # 隐藏边框
+        self.not_found_msgbox.exec_()
+        if self.not_found_msgbox == QtWidgets.QMessageBox.Yes:
+            self.on_button_reset_input_box()
+        elif self.not_found_msgbox == QtWidgets.QMessageBox.Cancel:
+            self.on_button_reset_input_box()
+
+    def error_format_msg_box(self):
+        self.error_format_msgbox = QtWidgets.QMessageBox()
+        self.error_format_msgbox.setWindowTitle("错误")
+        self.error_format_msgbox.setText("水平因素数输入错误，请重新输入！！")
+        confirm_button = QtWidgets.QPushButton("确定")
+        cancle_button = QtWidgets.QPushButton("取消")
+        confirm_button.setStyleSheet('''
+                    QPushButton{
+                        background-color: gray;
+                        border: 3px solid gray;
+                        border-radius: 5px;
+                        color: white;
+                        font-family: SimSun;
+                        font-size:25px;
+                    }
+                    QPushButton:hover{
+                        background-color: rgb(65,65,65);
+                        border: 3px solid gray;
+                        border-radius: 5px;
+                        border-color: rgb(65,65,65);
+                        color: white;
+                        font-family: Arial;
+                        font-family: SimSun;
+                    }
+                    QPushButton:pressed{
+                        background-color: rgb(1,1,1);
+                        border: 3px solid gray;
+                        border-radius: 5px;
+                        border-color: rgb(1,1,1);
+                        color: white;
+                        font-family: Arial;
+                        font-family: SimSun;
+                    }
+                ''')
+        cancle_button.setStyleSheet('''
+                    QPushButton{
+                        background-color: gray;
+                        border: 3px solid gray;
+                        border-radius: 5px;
+                        color: white;
+                        font-family: SimSun;
+                        font-size:25px;
+                    }
+                    QPushButton:hover{
+                        background-color: rgb(65,65,65);
+                        border: 3px solid gray;
+                        border-radius: 5px;
+                        border-color: rgb(65,65,65);
+                        color: white;
+                        font-family: Arial;
+                        font-family: SimSun;
+                    }
+                    QPushButton:pressed{
+                        background-color: rgb(1,1,1);
+                        border: 3px solid gray;
+                        border-radius: 5px;
+                        border-color: rgb(1,1,1);
+                        color: white;
+                        font-family: Arial;
+                        font-family: SimSun;
+                    }
+                ''')
+        self.error_format_msgbox.addButton(confirm_button, QtWidgets.QMessageBox.YesRole)
+        self.error_format_msgbox.addButton(cancle_button, QtWidgets.QMessageBox.NoRole)
+        self.error_format_msgbox.setStyleSheet('''
+                    QMessageBox{
+                        font-family:SimHei;
+                        font-size:25px;
+                        background-color:white;
+                        border:5px solid gray;
+                        border-radius:10px;
+                    }
+                ''')
+        self.error_format_msgbox.setWindowFlag(QtCore.Qt.FramelessWindowHint)  # 隐藏边框
+        self.error_format_msgbox.exec_()
+        if self.error_format_msgbox == QtWidgets.QMessageBox.Yes:
+            self.on_button_reset_input_box()
+        elif self.error_format_msgbox == QtWidgets.QMessageBox.Cancel:
+            self.on_button_reset_input_box()
             return
 
-    @staticmethod
-    def find_factor_num_in_table(factor_num_str, table):
+    def find_factor_num_in_normal_table(self, factor_num_str, table):
         result = []
-        input_level_num = int(factor_num_str.split('^')[0])
-        input_factor_num = int(factor_num_str.split('^')[1])
+        formated_list = []
+        factor_num_str_splited = factor_num_str.split('^')
+        for str_splited in factor_num_str_splited:
+            if len(str_splited) > 1:
+                str_splited = str_splited.split(' ')
+                print(str_splited)
+                for _str in str_splited:
+                    formated_list.append(_str)
+                continue
+            formated_list.append(str_splited)
+        # print(formated_list)
+        input_level_num = int(formated_list[0])
+        input_factor_num = int(formated_list[1])
         for index, line in enumerate(table):
             if '^' in line:
-                table_len = line.split(' ')[-1].split('\n')[0]
-                table_len = int(table_len.split('n=')[-1])
+                print(line)
+                table_len = int(line.split(' ')[-1].split('\n')[0].split('n=')[-1])
+                self.table_len = table_len
                 table_factor_num = line.split(' ')[0]
-                level_num = int(table_factor_num.split('^')[0])
-                factor_num = int(table_factor_num.split('^')[1])
-                if input_level_num == level_num and input_factor_num == factor_num:
+                self.level_num = int(table_factor_num.split('^')[0])
+                self.factor_num = int(table_factor_num.split('^')[1])
+                if input_level_num == self.level_num and input_factor_num == self.factor_num:
                     for i in range(index + 1, index + table_len + 1):
                         result.append(table[i].split('\n')[0])
                     break
+        if len(result) == 0:
+            return None
         return result
 
     def on_commit_factor_num(self):
         self.factor_num = self.right_search_widget_input.text()
         self.factor_level = self.factor_box.toPlainText()
+        # normal table
         if '^' in self.factor_num:
             if self.factor_level is '':
                 self.empty_msg_box()
                 return
-            table = Tools.get_normal_table()
-            result = MainUI.find_factor_num_in_table(self.factor_num, table)
+            table = Tools.get_table()
+            result = self.find_factor_num_in_normal_table(self.factor_num, table)
+            if result is None:
+                self.not_found_msg_box()
+                return
             sample_list = []
             factor_list = []
             outputs = []
@@ -606,8 +786,9 @@ class MainUI(QtWidgets.QMainWindow):
             self.factor_level = re.split("\n", self.factor_level)
             for factor in self.factor_level:
                 factor_list.append(factor.split(','))
-            # print(sample_list)
-            # print(factor_list)
+
+            print(sample_list)
+            print(factor_list)
 
             for samle in sample_list:
                 output = []
@@ -618,7 +799,9 @@ class MainUI(QtWidgets.QMainWindow):
                 for i, __result in enumerate(_result):
                     if i == len(_result) - 1:
                         final_result += (__result + "\n")
+                        continue
                     final_result += (__result + ",")
+            print(final_result)
             self.output_box.setPlainText(final_result)
         else:
             self.error_msg_box()
@@ -629,10 +812,12 @@ class Tools:
         self.table = []
         self.lines = []
 
-    def get_table(self):
+    @staticmethod
+    def get_table():
         with open("./data/ts723_Designs.txt", "r") as f:
-            self.lines = f.readlines()
-        return self.lines
+            lines = f.readlines()
+        return lines
+
     @staticmethod
     def get_normal_table():
         with open("./data/ts723_Designs.txt", "r") as f:
