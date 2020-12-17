@@ -1,5 +1,6 @@
 # coding: utf-8
 
+import re
 import qtawesome
 from PyQt5 import QtCore, QtWidgets
 
@@ -10,7 +11,7 @@ from gui_utils.thread_ui import UI_Thread
 class MainUI(QtWidgets.QMainWindow):
     def __init__(self):
         super(MainUI, self).__init__()
-        self.setFixedSize(960, 700)
+        self.setFixedSize(1270, 800)
         self.main_widget = QtWidgets.QWidget()
         self.main_layout = QtWidgets.QGridLayout()
         self.main_widget.setLayout(self.main_layout)
@@ -81,8 +82,6 @@ class MainUI(QtWidgets.QMainWindow):
         self.init_generating_table_page()
         self.thread_ui = UI_Thread()
 
-        # self.init_input_box()
-
     def init_button(self):
         self.left_close = QtWidgets.QPushButton("")
         self.left_visit = QtWidgets.QPushButton("")
@@ -90,8 +89,7 @@ class MainUI(QtWidgets.QMainWindow):
         self.left_close.setFixedSize(20, 20)  # 设置关闭按钮的大小
         self.left_visit.setFixedSize(20, 20)  # 设置按钮大小
         self.left_mini.setFixedSize(20, 20)  # 设置最小化按钮大小
-        self.left_close.setStyleSheet(
-            '''
+        self.left_close.setStyleSheet('''
             QPushButton{ 
                 background:rgb(250,0,0);
             border-radius:10px;
@@ -103,8 +101,7 @@ class MainUI(QtWidgets.QMainWindow):
                 background:rgb(255,0,0);
             }
             ''')
-        self.left_visit.setStyleSheet(
-            '''
+        self.left_visit.setStyleSheet('''
             QPushButton{
                 background:rgb(225,225,0);
                 border-radius:10px;
@@ -116,8 +113,7 @@ class MainUI(QtWidgets.QMainWindow):
                 background:rgb(255,255,0);
             }
         ''')
-        self.left_mini.setStyleSheet(
-            '''
+        self.left_mini.setStyleSheet('''
             QPushButton{
                 background:rgb(0,225,0);
                 border-radius:10px;
@@ -165,8 +161,7 @@ class MainUI(QtWidgets.QMainWindow):
         # self.right_search_widget_input = QtWidgets.QLineEdit()
         self.right_search_widget_input = myQLineEdit(self.right_bar_layout)
         self.right_search_widget_input.setPlaceholderText("请输入水平数^因素数")
-        self.right_search_widget_input.setStyleSheet(
-            '''
+        self.right_search_widget_input.setStyleSheet('''
             QLineEdit{
                     border:1px solid gray;
                     width:300px;
@@ -192,8 +187,7 @@ class MainUI(QtWidgets.QMainWindow):
         self.title_widget.setObjectName("title_label")
         self.title_widget.setText("正交表查询工具")
         self.title_widget.setAlignment(QtCore.Qt.AlignHCenter)
-        self.title_widget.setStyleSheet(
-            '''
+        self.title_widget.setStyleSheet('''
             QLabel#title_label {
                 border:none;
                 color: red;
@@ -201,7 +195,7 @@ class MainUI(QtWidgets.QMainWindow):
                 font-family: SimSun;
             }
         '''
-        )
+                                        )
 
         self.introduction_background = QtWidgets.QLabel()
         self.introduction_background.setObjectName("introduction_background")
@@ -224,13 +218,6 @@ class MainUI(QtWidgets.QMainWindow):
         self.introdcution_label_widget_2.setObjectName("troduction_label_2")
         self.introdcution_label_widget_2.setText(
             "PommesPeter\t\nEmail:me@pommespeter.com\t\nGithub ID: PommesPeter\t\nTencentQQ: 434596665")
-        # self.introduction_label_widget_2.setStyleSheet('''
-        #     QLabel#introduction_label_2 {
-        #         border-radius:45px;
-        #         font-size: 25px;
-        #         font-family: SimSun;
-        #     }
-        # ''')
 
         self.introduction_label_widget.resize(50, 50)
         # self.introduction_label_widget_2.resize(50, 50)
@@ -254,8 +241,7 @@ class MainUI(QtWidgets.QMainWindow):
         ''')
         self.right_search_widget_input = QtWidgets.QLineEdit()
         self.right_search_widget_input.setPlaceholderText("请输入水平数^因素数")
-        self.right_search_widget_input.setStyleSheet(
-            '''
+        self.right_search_widget_input.setStyleSheet('''
             QLineEdit{
                     border:1px solid gray;
                     width:250px;
@@ -276,7 +262,6 @@ class MainUI(QtWidgets.QMainWindow):
         self.factor_box.setStyleSheet('''
             QPlainTextEdit{
                 border:3px solid gray;
-                width: 150px;
                 height: 50px;
                 border-radius:5px;
                 padding: 5px;
@@ -287,7 +272,6 @@ class MainUI(QtWidgets.QMainWindow):
         self.output_box.setStyleSheet('''
            QPlainTextEdit{
                border:3px solid gray;
-               width: 150px;
                height: 50px;
                border-radius:5px;
                padding 5px;
@@ -385,9 +369,9 @@ class MainUI(QtWidgets.QMainWindow):
         self.right_bar_layout.addWidget(self.search_icon, 1, 0, 1, 1)
         self.right_bar_layout.addWidget(self.right_search_widget_input, 1, 1, 1, 5)
         self.right_bar_layout.addWidget(self.factor_box_label, 2, 0, 1, 1)
-        self.right_bar_layout.addWidget(self.output_box_label, 2, 2, 1, 1)
-        self.right_bar_layout.addWidget(self.factor_box, 3, 0, 3, 1)
-        self.right_bar_layout.addWidget(self.output_box, 3, 2, 3, 1)
+        self.right_bar_layout.addWidget(self.output_box_label, 2, 3, 1, 1)
+        self.right_bar_layout.addWidget(self.factor_box, 3, 0, 3, 3)
+        self.right_bar_layout.addWidget(self.output_box, 3, 3, 3, 4)
         self.right_layout.addWidget(self.commit_button, 6, 1, 1, 3)
         self.right_layout.addWidget(self.reset_button, 6, 5, 1, 3)
 
@@ -416,14 +400,79 @@ class MainUI(QtWidgets.QMainWindow):
         self.right_search_widget_input.setText("")
 
     def error_msg_box(self):
-        # self.error_msgbox = QtWidgets.QMessageBox.warning(self, "Error", "输入格式有误，请重新输入！！",
-        #                                                   QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.Cancel,
-        #                                                   QtWidgets.QMessageBox.Ok)
         self.error_msgbox = QtWidgets.QMessageBox()
         self.error_msgbox.setWindowTitle("错误")
         self.error_msgbox.setText("输入格式有误，请重新输入！！")
-        self.error_msgbox.addButton(QtWidgets.QPushButton("确定"), QtWidgets.QMessageBox.YesRole)
-        self.error_msgbox.addButton(QtWidgets.QPushButton("取消"), QtWidgets.QMessageBox.NoRole)
+        confirm_button = QtWidgets.QPushButton("确定")
+        cancle_button = QtWidgets.QPushButton("取消")
+        confirm_button.setStyleSheet('''
+            QPushButton{
+                background-color: gray;
+                border: 3px solid gray;
+                border-radius: 5px;
+                color: white;
+                font-family: SimSun;
+                font-size:25px;
+            }
+            QPushButton:hover{
+                background-color: rgb(65,65,65);
+                border: 3px solid gray;
+                border-radius: 5px;
+                border-color: rgb(65,65,65);
+                color: white;
+                font-family: Arial;
+                font-family: SimSun;
+            }
+            QPushButton:pressed{
+                background-color: rgb(1,1,1);
+                border: 3px solid gray;
+                border-radius: 5px;
+                border-color: rgb(1,1,1);
+                color: white;
+                font-family: Arial;
+                font-family: SimSun;
+            }
+        ''')
+        cancle_button.setStyleSheet('''
+            QPushButton{
+                background-color: gray;
+                border: 3px solid gray;
+                border-radius: 5px;
+                color: white;
+                font-family: SimSun;
+                font-size:25px;
+            }
+            QPushButton:hover{
+                background-color: rgb(65,65,65);
+                border: 3px solid gray;
+                border-radius: 5px;
+                border-color: rgb(65,65,65);
+                color: white;
+                font-family: Arial;
+                font-family: SimSun;
+            }
+            QPushButton:pressed{
+                background-color: rgb(1,1,1);
+                border: 3px solid gray;
+                border-radius: 5px;
+                border-color: rgb(1,1,1);
+                color: white;
+                font-family: Arial;
+                font-family: SimSun;
+            }
+        ''')
+        self.error_msgbox.addButton(confirm_button, QtWidgets.QMessageBox.YesRole)
+        self.error_msgbox.addButton(cancle_button, QtWidgets.QMessageBox.NoRole)
+        self.error_msgbox.setWindowFlag(QtCore.Qt.FramelessWindowHint)  # 隐藏边框
+        self.error_msgbox.setStyleSheet('''
+            QMessageBox{
+                font-family:SimHei;
+                font-size:25px;
+                background-color:white;
+                border:5px solid gray;
+                border-radius:10px;
+            }
+        ''')
         self.error_msgbox.exec_()
         if self.error_msgbox == QtWidgets.QMessageBox.Ok:
             self.factor_box.setPlainText("")
@@ -436,14 +485,79 @@ class MainUI(QtWidgets.QMainWindow):
             return
 
     def empty_msg_box(self):
-        # self.empty_msgbox = QtWidgets.QMessageBox.warning(self, "Error", "水平因素框输入为空，请重新输入！！",
-        #                                                   QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.Cancel,
-        #                                                   QtWidgets.QMessageBox.Ok)
         self.empty_msgbox = QtWidgets.QMessageBox()
         self.empty_msgbox.setWindowTitle("错误")
         self.empty_msgbox.setText("水平因素框输入为空，请重新输入！！")
-        self.empty_msgbox.addButton(QtWidgets.QPushButton("确定"), QtWidgets.QMessageBox.YesRole)
-        self.empty_msgbox.addButton(QtWidgets.QPushButton("取消"), QtWidgets.QMessageBox.NoRole)
+        confirm_button = QtWidgets.QPushButton("确定")
+        cancle_button = QtWidgets.QPushButton("取消")
+        confirm_button.setStyleSheet('''
+            QPushButton{
+                background-color: gray;
+                border: 3px solid gray;
+                border-radius: 5px;
+                color: white;
+                font-family: SimSun;
+                font-size:25px;
+            }
+            QPushButton:hover{
+                background-color: rgb(65,65,65);
+                border: 3px solid gray;
+                border-radius: 5px;
+                border-color: rgb(65,65,65);
+                color: white;
+                font-family: Arial;
+                font-family: SimSun;
+            }
+            QPushButton:pressed{
+                background-color: rgb(1,1,1);
+                border: 3px solid gray;
+                border-radius: 5px;
+                border-color: rgb(1,1,1);
+                color: white;
+                font-family: Arial;
+                font-family: SimSun;
+            }
+        ''')
+        cancle_button.setStyleSheet('''
+            QPushButton{
+                background-color: gray;
+                border: 3px solid gray;
+                border-radius: 5px;
+                color: white;
+                font-family: SimSun;
+                font-size:25px;
+            }
+            QPushButton:hover{
+                background-color: rgb(65,65,65);
+                border: 3px solid gray;
+                border-radius: 5px;
+                border-color: rgb(65,65,65);
+                color: white;
+                font-family: Arial;
+                font-family: SimSun;
+            }
+            QPushButton:pressed{
+                background-color: rgb(1,1,1);
+                border: 3px solid gray;
+                border-radius: 5px;
+                border-color: rgb(1,1,1);
+                color: white;
+                font-family: Arial;
+                font-family: SimSun;
+            }
+        ''')
+        self.empty_msgbox.addButton(confirm_button, QtWidgets.QMessageBox.YesRole)
+        self.empty_msgbox.addButton(cancle_button, QtWidgets.QMessageBox.NoRole)
+        self.empty_msgbox.setStyleSheet('''
+            QMessageBox{
+                font-family:SimHei;
+                font-size:25px;
+                background-color:white;
+                border:5px solid gray;
+                border-radius:10px;
+            }
+        ''')
+        self.empty_msgbox.setWindowFlag(QtCore.Qt.FramelessWindowHint)  # 隐藏边框
         self.empty_msgbox.exec_()
         if self.empty_msgbox == QtWidgets.QMessageBox.Yes:
             self.factor_box.setPlainText("")
@@ -455,14 +569,72 @@ class MainUI(QtWidgets.QMainWindow):
             self.right_search_widget_input.setText("")
             return
 
+    @staticmethod
+    def find_factor_num_in_table(factor_num_str, table):
+        result = []
+        input_level_num = int(factor_num_str.split('^')[0])
+        input_factor_num = int(factor_num_str.split('^')[1])
+        for index, line in enumerate(table):
+            if '^' in line:
+                table_len = line.split(' ')[-1].split('\n')[0]
+                table_len = int(table_len.split('n=')[-1])
+                table_factor_num = line.split(' ')[0]
+                level_num = int(table_factor_num.split('^')[0])
+                factor_num = int(table_factor_num.split('^')[1])
+                if input_level_num == level_num and input_factor_num == factor_num:
+                    for i in range(index + 1, index + table_len + 1):
+                        result.append(table[i].split('\n')[0])
+                    break
+        return result
+
     def on_commit_factor_num(self):
-        # self.thread_ui.start()
         self.factor_num = self.right_search_widget_input.text()
         self.factor_level = self.factor_box.toPlainText()
         if '^' in self.factor_num:
-            print('^sss')
-            print(self.factor_level)
             if self.factor_level is '':
                 self.empty_msg_box()
+                return
+            table = Tools.get_normal_table()
+            result = MainUI.find_factor_num_in_table(self.factor_num, table)
+            sample_list = []
+            factor_list = []
+            outputs = []
+            final_result = ""
+            for sample in result:
+                sample_list.append([int(x) for x in sample])
+            self.factor_level = self.factor_box.toPlainText()
+            self.factor_level = re.split("\n", self.factor_level)
+            for factor in self.factor_level:
+                factor_list.append(factor.split(','))
+            # print(sample_list)
+            # print(factor_list)
+
+            for samle in sample_list:
+                output = []
+                for i, index in enumerate(samle):
+                    output.append(factor_list[i][index])
+                outputs.append(output)
+            for _result in outputs:
+                for i, __result in enumerate(_result):
+                    if i == len(_result) - 1:
+                        final_result += (__result + "\n")
+                    final_result += (__result + ",")
+            self.output_box.setPlainText(final_result)
         else:
             self.error_msg_box()
+
+
+class Tools:
+    def __init__(self):
+        self.table = []
+        self.lines = []
+
+    def get_table(self):
+        with open("./data/ts723_Designs.txt", "r") as f:
+            self.lines = f.readlines()
+        return self.lines
+    @staticmethod
+    def get_normal_table():
+        with open("./data/ts723_Designs.txt", "r") as f:
+            lines = f.readlines()
+        return lines[:157]
