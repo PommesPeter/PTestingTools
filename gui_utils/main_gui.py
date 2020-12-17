@@ -2,6 +2,7 @@
 
 import os
 import re
+import time
 
 import qtawesome
 from PyQt5 import QtCore, QtWidgets, QtGui
@@ -217,11 +218,48 @@ class MainUI(QtWidgets.QMainWindow):
         ''')
         self.about_button.clicked.connect(self.on_about_msg_box)
 
+        self.network_testing_button = QtWidgets.QPushButton("网络环境测试")
+        self.network_testing_button.setObjectName("network_testing_button")
+        self.network_testing_button.setStyleSheet('''
+            QPushButton#network_testing_button {
+                width: 20px;
+                height: 40px;
+                background-color: gray;
+                border: 3px solid gray;
+                border-radius: 5px;
+                color: white;
+                font-family: Microsoft YaHei UI;
+                font-size: 25px;
+            }
+            QPushButton#network_testing_button:hover{
+                width: 20px;
+                height: 40px;
+                background-color: rgb(65,65,65);
+                border: 3px solid gray;
+                border-radius: 5px;
+                border-color: rgb(65,65,65);
+                color: white;
+                font-family: Microsoft YaHei UI;
+            }
+            QPushButton#network_testing_button:pressed{
+                width: 20px;
+                height: 40px;
+                background-color: rgb(1,1,1);
+                border: 3px solid gray;
+                border-radius: 5px;
+                border-color: rgb(1,1,1);
+                color: white;
+                font-family: Microsoft YaHei UI;
+            }
+        ''')
+        self.network_testing_button.clicked.connect(self.on_network_testing)
+
         self.introduction_background = QtWidgets.QLabel()
         self.introduction_background.setObjectName("introduction_background")
 
         self.right_subwidgets_layout.addWidget(self.img_label, 1, 0, 1, 5)
         self.right_subwidgets_layout.addWidget(self.about_button, 4, 4, 1, 1)
+        self.right_subwidgets_layout.addWidget(self.network_testing_button, 4, 3, 1, 1)
         self.right_layout.addWidget(self.right_subwidgets, 0, 0, 1, 9)
 
     def init_generating_table_page(self):
@@ -1069,6 +1107,67 @@ class MainUI(QtWidgets.QMainWindow):
         if len(result) == 0:
             return None
         return result
+
+    def on_network_testing(self):
+
+        print('正在检测您的网络环境(baidu.com)...')
+        res = os.popen('nslookup baidu.com').read()
+        res_dns = re.findall(r'Address:  (.*?)\n.*?Address:  (.*?)\n', res, re.S)
+
+        if res_dns != []:
+            print('您使用的DNS服务器是：', res_dns[0][0])
+            print('您使用的虚拟桌面公网地址是：', res_dns[0][1], '\n')
+        else:
+            print('DNS解析错误！')
+
+        res_ct = os.popen('ping 1.1.1.1').read()
+        res_cnc = os.popen('ping 2.2.2.2').read()
+        res_cmcc = os.popen('ping 3.3.3.3').read()
+
+        res_ct2 = re.findall(r'.*?丢失 = (.*?) .*?平均 = (.*?)ms', res_ct, re.S)
+        res_cnc2 = re.findall(r'.*?丢失 = (.*?) .*?平均 = (.*?)ms', res_cnc, re.S)
+        res_cmcc2 = re.findall(r'.*?丢失 = (.*?) .*?平均 = (.*?)ms', res_cmcc, re.S)
+
+        if res_ct2 != [] and res_cnc2 != [] and res_cmcc2 != []:
+            print('访问虚拟桌面电信地址丢包量和网络延时分别为：', res_ct2[0])
+            print('访问虚拟桌面联通地址丢包量和网络延时分别为：', res_cnc2[0])
+            print('访问虚拟桌面移动地址丢包量和网络延时分别为：', res_cmcc2[0], '\n')
+
+            miss_ct, miss_cnc, miss_cmcc = int(res_ct2[0][0]), int(res_cnc2[0][0]), int(res_cmcc2[0][0])
+            delay_ct, delay_cnc, delay_cmcc = int(res_ct2[0][1]), int(res_cnc2[0][1]), int(res_cmcc2[0][1])
+
+            if miss_ct == 0 and delay_ct <= delay_cnc and delay_ct <= delay_cmcc:
+                print('建议通过电信地址访问虚拟桌面(1.1.1.1)')
+                try:
+                    with open('C:\Windows\System32\drivers\etc\hosts', 'a', encoding='utf-8', errors='ignore') as f:
+                        res_writehosts = f.write('\n1.1.1.1 view.xxx.com.cn\n')
+                        print('已绑定电信地址1.1.1.1,写入hosts文件!')
+                except:
+                    print('写入hosts文件失败！(电信)')
+            elif miss_cnc == 0 and delay_cnc <= delay_ct and delay_cnc <= delay_cmcc:
+                print('建议通过联通地址访问虚拟桌面(2.2.2.2)')
+                try:
+                    with open('C:\Windows\System32\drivers\etc\hosts', 'a', encoding='utf-8', errors='ignore') as f:
+                        res_writehosts = f.write('\n2.2.2.2 view.xxx.com.cn\n')
+                        print('已绑定联通地址2.2.2.2,写入hosts文件!')
+                except:
+                    print('写入hosts文件失败！(联通)')
+            elif miss_cmcc == 0 and delay_cmcc <= delay_ct and delay_cmcc <= delay_cnc:
+                print('建议通过移动地址访问虚拟桌面(3.3.3.3)')
+                try:
+                    with open('C:\Windows\System32\drivers\etc\hosts', 'a', encoding='utf-8', errors='ignore') as f:
+                        res_writehosts = f.write('\n3.3.3.3 view.xxx.com.cn\n')
+                        print('已绑定移动地址3.3.3.3,写入hosts文件!')
+                except:
+                    print('写入hosts文件失败！(移动)')
+
+            if miss_ct != 0 and miss_cnc != 0 and miss_cmcc != 0:
+                print('网络质量差，请联系管理员！(错误代码-1)')
+        else:
+            print('网络质量差，请联系管理员！(错误代码-2)')
+
+        print('检测完成,窗口稍后自动关闭...')
+        time.sleep(60)
 
     def on_close_program(self):
         app = QtWidgets.QApplication.instance()
