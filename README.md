@@ -1,4 +1,4 @@
-# Pwidget for Software Testing
+# PTestingTools for Software Testing
 
 > This repo is for the final assignment in Software Testing. I hope it will be useful in my future Software Development
 
