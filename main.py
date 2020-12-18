@@ -1,5 +1,5 @@
 
-from PyQt5 import QtWidgets
+from PyQt5 import QtWidgets, QtGui
 from gui_utils.main_gui import MainUI, Tools
 from gui_utils.show_result import *
 from utils.utils import *

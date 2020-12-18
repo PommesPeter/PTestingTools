@@ -17,6 +17,10 @@
    - requirements.txt: install environment what this software needed.
    - README.md: YOU ARE WATCHING NOW.
 
+## ScreenShot
+
+![alt](./gui_utils/pic/3.png)   
+
 ## Schedule 
 
 ### GUI

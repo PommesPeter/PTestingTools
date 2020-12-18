@@ -3,9 +3,13 @@
 import os
 import re
 import time
-
+import threading
 import qtawesome
 from PyQt5 import QtCore, QtWidgets, QtGui
+from gui_utils.ui_thread import UI_Thread
+
+import ctypes
+ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("myappid")
 
 
 class MainUI(QtWidgets.QMainWindow):
@@ -14,6 +18,9 @@ class MainUI(QtWidgets.QMainWindow):
         self.factor_level = ""
         self.final_result = ""
         self.query_result = ""
+        self.setWindowIcon(QtGui.QIcon('E:\\Workspace\\Python\\PTestingTools\\gui_utils\\pic\\Tools.png'))
+
+        self.setWindowTitle("PTestingTools")
         self.setFixedSize(1270, 800)
         self.main_widget = QtWidgets.QWidget()
         self.main_layout = QtWidgets.QGridLayout()
@@ -79,11 +86,12 @@ class MainUI(QtWidgets.QMainWindow):
         self.setAttribute(QtCore.Qt.WA_TranslucentBackground)  # 设置窗口背景透明
         self.setWindowFlag(QtCore.Qt.FramelessWindowHint)  # 隐藏边框
         self.main_layout.setSpacing(0)
-
+        self.mythread = UI_Thread()
         self.init_button()
         self.init_main_page()
         self.init_generating_table_page()
         self.init_table_query_page()
+
 
     def init_button(self):
         self.left_close = QtWidgets.QPushButton("")
@@ -172,7 +180,7 @@ class MainUI(QtWidgets.QMainWindow):
         # 添加组件，往right_software_title
         self.right_subwidgets.setLayout(self.right_subwidgets_layout)
 
-        self.img = QtGui.QPixmap('E:/Workspace/Python/Pwidgets/gui_utils/pic/2.png')
+        self.img = QtGui.QPixmap('E:/Workspace/Python/PTestingTools/gui_utils/pic/2.png')
         self.img_label = QtWidgets.QLabel()
         self.img_label.setObjectName("img_label")
         self.img_label.setPixmap(self.img)
@@ -644,7 +652,6 @@ class MainUI(QtWidgets.QMainWindow):
         self.query_button.setVisible(False)
         self.reset_query_button.setVisible(False)
 
-
     def on_button_generating_table_page_switch(self):
         self.right_bar_widget.setVisible(True)
         self.commit_button.setVisible(True)
@@ -1076,6 +1083,82 @@ class MainUI(QtWidgets.QMainWindow):
         self.error_format_msgbox.setWindowFlag(QtCore.Qt.FramelessWindowHint)  # 隐藏边框
         self.error_format_msgbox.exec_()
 
+    def network_status_msg_box(self, content):
+        self.network_status_msgbox = QtWidgets.QMessageBox()
+        self.network_status_msgbox.setWindowTitle("网络状态")
+        self.network_status_msgbox.setText("测试结果\n" + content)
+        confirm_button = QtWidgets.QPushButton("确定")
+        cancle_button = QtWidgets.QPushButton("取消")
+        confirm_button.setStyleSheet('''
+            QPushButton{
+                width: 60px;
+                height: 30px;
+                background-color: gray;
+                border: 3px solid gray;
+                border-radius: 5px;
+                color: white;
+                font-family: Microsoft YaHei UI;
+                font-size:20px;
+            }
+            QPushButton:hover{
+                background-color: rgb(65,65,65);
+                border: 3px solid gray;
+                border-radius: 5px;
+                border-color: rgb(65,65,65);
+                color: white;
+                font-family: Microsoft YaHei UI;
+            }
+            QPushButton:pressed{
+                background-color: rgb(1,1,1);
+                border: 3px solid gray;
+                border-radius: 5px;
+                border-color: rgb(1,1,1);
+                color: white;
+                font-family: Microsoft YaHei UI;
+            }
+        ''')
+        cancle_button.setStyleSheet('''
+            QPushButton{
+                width: 60px;
+                height: 30px;
+                background-color: gray;
+                border: 3px solid gray;
+                border-radius: 5px;
+                color: white;
+                font-family: Microsoft YaHei UI;
+                font-size:20px;
+            }
+            QPushButton:hover{
+                background-color: rgb(65,65,65);
+                border: 3px solid gray;
+                border-radius: 5px;
+                border-color: rgb(65,65,65);
+                color: white;
+                font-family: Microsoft YaHei UI;
+            }
+            QPushButton:pressed{
+                background-color: rgb(1,1,1);
+                border: 3px solid gray;
+                border-radius: 5px;
+                border-color: rgb(1,1,1);
+                color: white;
+                font-family: Microsoft YaHei UI;
+            }
+        ''')
+        self.network_status_msgbox.addButton(confirm_button, QtWidgets.QMessageBox.YesRole)
+        self.network_status_msgbox.addButton(cancle_button, QtWidgets.QMessageBox.NoRole)
+        self.network_status_msgbox.setStyleSheet('''
+            QMessageBox{
+                font-family:Consolas;
+                font-size:15px;
+                background-color:white;
+                border:5px solid gray;
+                border-radius:10px;
+            }
+        ''')
+        self.network_status_msgbox.setWindowFlag(QtCore.Qt.FramelessWindowHint)  # 隐藏边框
+        self.network_status_msgbox.exec_()
+
     def find_factor_num_in_table(self, factor_num_str, table):
         result = []
         self.formated_list = []
@@ -1109,65 +1192,13 @@ class MainUI(QtWidgets.QMainWindow):
         return result
 
     def on_network_testing(self):
+        # self.network_testing()
+        self.mythread.start()
+        address = "baidu.com"
+        print("正在尝试连接" + address + "...")
+        _str = os.popen('ping ' + address)
+        self.network_status_msg_box(_str.read())
 
-        print('正在检测您的网络环境(baidu.com)...')
-        res = os.popen('nslookup baidu.com').read()
-        res_dns = re.findall(r'Address:  (.*?)\n.*?Address:  (.*?)\n', res, re.S)
-
-        if res_dns != []:
-            print('您使用的DNS服务器是：', res_dns[0][0])
-            print('您使用的虚拟桌面公网地址是：', res_dns[0][1], '\n')
-        else:
-            print('DNS解析错误！')
-
-        res_ct = os.popen('ping 1.1.1.1').read()
-        res_cnc = os.popen('ping 2.2.2.2').read()
-        res_cmcc = os.popen('ping 3.3.3.3').read()
-
-        res_ct2 = re.findall(r'.*?丢失 = (.*?) .*?平均 = (.*?)ms', res_ct, re.S)
-        res_cnc2 = re.findall(r'.*?丢失 = (.*?) .*?平均 = (.*?)ms', res_cnc, re.S)
-        res_cmcc2 = re.findall(r'.*?丢失 = (.*?) .*?平均 = (.*?)ms', res_cmcc, re.S)
-
-        if res_ct2 != [] and res_cnc2 != [] and res_cmcc2 != []:
-            print('访问虚拟桌面电信地址丢包量和网络延时分别为：', res_ct2[0])
-            print('访问虚拟桌面联通地址丢包量和网络延时分别为：', res_cnc2[0])
-            print('访问虚拟桌面移动地址丢包量和网络延时分别为：', res_cmcc2[0], '\n')
-
-            miss_ct, miss_cnc, miss_cmcc = int(res_ct2[0][0]), int(res_cnc2[0][0]), int(res_cmcc2[0][0])
-            delay_ct, delay_cnc, delay_cmcc = int(res_ct2[0][1]), int(res_cnc2[0][1]), int(res_cmcc2[0][1])
-
-            if miss_ct == 0 and delay_ct <= delay_cnc and delay_ct <= delay_cmcc:
-                print('建议通过电信地址访问虚拟桌面(1.1.1.1)')
-                try:
-                    with open('C:\Windows\System32\drivers\etc\hosts', 'a', encoding='utf-8', errors='ignore') as f:
-                        res_writehosts = f.write('\n1.1.1.1 view.xxx.com.cn\n')
-                        print('已绑定电信地址1.1.1.1,写入hosts文件!')
-                except:
-                    print('写入hosts文件失败！(电信)')
-            elif miss_cnc == 0 and delay_cnc <= delay_ct and delay_cnc <= delay_cmcc:
-                print('建议通过联通地址访问虚拟桌面(2.2.2.2)')
-                try:
-                    with open('C:\Windows\System32\drivers\etc\hosts', 'a', encoding='utf-8', errors='ignore') as f:
-                        res_writehosts = f.write('\n2.2.2.2 view.xxx.com.cn\n')
-                        print('已绑定联通地址2.2.2.2,写入hosts文件!')
-                except:
-                    print('写入hosts文件失败！(联通)')
-            elif miss_cmcc == 0 and delay_cmcc <= delay_ct and delay_cmcc <= delay_cnc:
-                print('建议通过移动地址访问虚拟桌面(3.3.3.3)')
-                try:
-                    with open('C:\Windows\System32\drivers\etc\hosts', 'a', encoding='utf-8', errors='ignore') as f:
-                        res_writehosts = f.write('\n3.3.3.3 view.xxx.com.cn\n')
-                        print('已绑定移动地址3.3.3.3,写入hosts文件!')
-                except:
-                    print('写入hosts文件失败！(移动)')
-
-            if miss_ct != 0 and miss_cnc != 0 and miss_cmcc != 0:
-                print('网络质量差，请联系管理员！(错误代码-1)')
-        else:
-            print('网络质量差，请联系管理员！(错误代码-2)')
-
-        print('检测完成,窗口稍后自动关闭...')
-        time.sleep(60)
 
     def on_close_program(self):
         app = QtWidgets.QApplication.instance()

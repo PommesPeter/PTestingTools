@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/Pwidgets.iml" filepath="$PROJECT_DIR$/.idea/Pwidgets.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/PTestingTools.iml" filepath="$PROJECT_DIR$/.idea/PTestingTools.iml" />
     </modules>
   </component>
 </project>
