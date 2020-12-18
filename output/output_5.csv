@@ -1,0 +1,10 @@
+IIS,win10,None,IE11
+IIS,Linux,Plugin,Chrome
+IIS,win7,Mini,Firefox
+Apache,win10,Plugin,Firefox
+Apache,Linux,Mini,IE11
+Apache,win7,None,Chrome
+Jetty,win10,Mini,Chrome
+Jetty,Linux,None,Firefox
+Jetty,win7,Plugin,IE11
+

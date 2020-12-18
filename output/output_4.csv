@@ -1,0 +1,10 @@
+IIS,win10,无,IE11
+IIS,Linux,微信插件,Chrome
+IIS,win7,小程序,Firefox
+Apache,win10,微信插件,Firefox
+Apache,Linux,小程序,IE11
+Apache,win7,无,Chrome
+Jetty,win10,小程序,Chrome
+Jetty,Linux,无,Firefox
+Jetty,win7,微信插件,IE11
+
