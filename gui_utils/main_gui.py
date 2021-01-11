@@ -774,7 +774,7 @@ class MainUI(QtWidgets.QMainWindow):
 
     def empty_msg_box(self):
         self.empty_msgbox = QtWidgets.QMessageBox()
-        self.empty_msgbox.setWindowTitle("错误")
+        self.empty_msgbox.setWindowTitle("错误")      
         self.empty_msgbox.setText("水平因素框输入为空，请重新输入！！")
         confirm_button = QtWidgets.QPushButton("确定")
         cancle_button = QtWidgets.QPushButton("取消")
